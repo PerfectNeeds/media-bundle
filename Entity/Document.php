@@ -19,7 +19,6 @@ abstract class Document {
     private $id;
 
     /**
-     * @Assert\NotBlank()
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     protected $name;
@@ -33,11 +32,6 @@ abstract class Document {
      * @ORM\Column(name="size", type="float", length=255, nullable=true)
      */
     protected $size;
-
-    /**
-     *
-     * @Assert\NotBlank()
-     */
     protected $file;
 
     public function getUploadRootDirWithFileName() {

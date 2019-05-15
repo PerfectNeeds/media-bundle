@@ -14,7 +14,6 @@ abstract class Image {
     private $id;
 
     /**
-     * @Assert\NotBlank()
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     protected $name;
@@ -54,11 +53,6 @@ abstract class Image {
      * @ORM\Column(type="smallint", nullable=true)
      */
     protected $imageType;
-
-    /**
-     *
-     * @Assert\NotBlank()
-     */
     protected $file;
 
     public function getUploadRootDirWithFileName() {
