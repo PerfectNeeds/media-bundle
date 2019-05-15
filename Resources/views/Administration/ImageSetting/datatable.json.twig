@@ -1,0 +1,19 @@
+{
+    "recordsTotal":
+    {{ recordsTotal }},
+    "recordsFiltered":
+    {{ recordsFiltered }},
+    "data": [
+        {% for imageSetting in imageSettings %}
+        [
+            "{{ imageSetting.id }}",
+            "{{ imageSetting.entityName }}",
+            " {% for imageSettingType in imageSetting.imageSettingTypes %}{{ imageSettingType.imageType.name }}{% if imageSetting.imageSettingTypes|length != loop.index %}, {% endif %}{% endfor %}",
+            "{% if imageSetting.created %}{{ imageSetting.created|date('d/m/Y') }}{% else %}--{% endif %}",
+            " <ul class='icons-list'><li class='dropdown'><a href='#' class='dropdown-toggle' data-toggle='dropdown'><i class='icon-menu9'></i></a><ul class='dropdown-menu dropdown-menu-right'><li><a href='{{ path('imagesetting_edit',{'id':imageSetting.id}) }}'><i class='icon-pencil7'></i> Edit</a></li><li><a href='{{ path('imagesetting_type_index',{'id':imageSetting.id}) }}'><i class='icon-tree7'></i> Image types</a></li></ul></li></ul>"
+        ]
+        {% if loop.last == false %},
+        {% endif %}
+        {% endfor %}
+    ]
+}

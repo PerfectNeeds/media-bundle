@@ -1,0 +1,146 @@
+{% extends 'adminTemplate/base.html.twig' %}
+{% set page_title %}{{ imageSetting.entityName }} types{% endset %}
+
+    {% block stylesheets %}
+        {{ parent() }}
+    {% endblock stylesheets %}
+{% block breadcrumb %}
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="{{ path('dashboard') }}"><i class="icon-home2 position-left"></i>Dashboard</a></li>
+            <li><a href="{{ path('imagesetting_index') }}">Image settings</a></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+{% endblock %}
+{% block body %}
+    {% if is_granted("ROLE_SUPER_ADMIN") %}
+        <ul class="fab-menu fab-menu-fixed fab-menu-bottom-right">
+            <li>
+                <a href="{{ path('imagesetting_type_new',{'id':imageSetting.id}) }}"
+                   class="fab-menu-btn btn bg-blue btn-float btn-rounded btn-icon">
+                    <i class="fab-icon-open icon-plus3"></i>
+                    <i class="fab-icon-close icon-cross2"></i>
+                </a>
+            </li>
+        </ul>
+    {% endif %}
+    <!-- Ajax sourced data -->
+    <div class="panel panel-flat">
+        <div class="panel-body">
+            <table class="table datatable-ajax table-striped datatable-responsive">
+                <thead>
+                <tr>
+                    <th>Image Type</th>
+                    <th>Radio Button</th>
+                    <th>Dimension</th>
+                    <th>Thumb Dimension</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+    <!-- /ajax sourced data -->
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/tables/datatables/datatables.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/selects/select2.min.js') }}"></script>
+    {{ include('adminTemplate/datatable.html.twig', {'path':path('imagesetting_type_datatable',{'id':imageSetting.id})}) }}
+{% endblock javascripts %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{#{% extends 'AdminTemplateBundle::base.html.twig' %}#}
+{#{% set page_title %}{{ imageSetting.entityName }} List{% endset %}#}
+{#{% block stylesheets %}#}
+    {#{{ parent() }}#}
+    {#<link href="{{ asset('bundles/admintemplate/assets/plugins/datatable/css/bootstrap.datatable.min.css') }}" rel="stylesheet">#}
+{#{% endblock %}#}
+{#{% block body -%}#}
+    {#<div class="the-box text-right rounded">#}
+        {#<a class="btn btn-warning" href="{{ path('imagesetting') }}"><i class="fa fa-backward"></i>Back</a>#}
+        {#<a class="btn btn-success" href="{{ path('imagesetting_type_new' ,{'id':imageSetting.id}) }}">Create a new entry</a>#}
+    {#</div>#}
+    {#<div class="the-box">#}
+        {#<div class="table-responsive">#}
+            {#<table class="table table-striped table-hover" id="datatable-example">#}
+                {#<thead class="the-box dark full">#}
+                    {#<tr>#}
+                        {#<th>Id</th>#}
+                        {#<th>Image Type</th>#}
+                        {#<th>Radio Button</th>#}
+                        {#<th>Dimension</th>#}
+                        {#<th>Thumb Dimension</th>#}
+                        {#<th>Actions</th>#}
+                    {#</tr>#}
+                {#</thead>#}
+                {#<tbody>#}
+                    {#{% for entity in entities %}#}
+                        {#<tr>#}
+                            {#<td>{{ entity.imageType.id }}</td>#}
+                            {#<td>{{ entity.imageType.name }}</td>#}
+                            {#<td>#}
+                                {#{% if entity.radioButton == true %}#}
+                                    {#Yes#}
+                                {#{% else %}#}
+                                    {#No#}
+                                {#{% endif %}#}
+                            {#</td>#}
+                            {#<td>{{ entity.width }}px * {{ entity.height }}px </td>#}
+                            {#<td>#}
+
+                                {#{% if entity.thumbWidth == null and entity.thumbHeight == null %}#}
+                                    {#--    #}
+                                {#{% else %}#}
+                                    {#{% if entity.thumbWidth != null %}{{ entity.thumbWidth }}px {% else %} -- {% endif %}#}
+                                    {#*#}
+                                    {#{% if entity.thumbHeight != null %}{{ entity.thumbHeight }}px {% else %} -- {% endif %}#}
+                                {#{% endif %}#}
+                            {#<td>#}
+                                {#<a href="{{ path('imagesetting_type_edit', {'imageSettingId': imageSetting.id,'imageTypeId':entity.imageType.id }) }}" class="btn btn-info" title="Edit"><i class="fa fa-pencil"></i></a>#}
+                                {#<a  href="#" onclick="javascript:del({{entity.imageType.id}});" class="btn btn-danger" title="Delete"><i class="fa fa-minus"></i></a>#}
+                            {#</td>#}
+                        {#</tr>#}
+                    {#{% endfor %}#}
+                {#</tbody>#}
+            {#</table>#}
+        {#</div>#}
+    {#</div>#}
+    {#<form hidden name="delete_form" id="delete_form" action="{{ path('imagesetting_type_delete' ,{'imageSettingId':imageSetting.id}) }}" method="POST"  >#}
+        {#<input type="hidden" name="id" id="entityId" />#}
+    {#</form>#}
+
+{#{% endblock %}#}
+
+{#{% block javascripts %}#}
+    {#{{ parent() }}#}
+    {#<script type="text/javascript" src="{{ asset('bundles/admintemplate/assets/plugins/datatable/js/jquery.dataTables.min.js') }}"></script>#}
+    {#<script type="text/javascript" src="{{ asset('bundles/admintemplate/assets/plugins/datatable/js/bootstrap.datatable.js') }}"></script>#}
+    {#<script>#}
+        {#function del(id) {#}
+            {#if (confirm("Are you sure you want to delete?")){#}
+                {#$('#entityId').val(id);#}
+                {#$('#delete_form').submit();#}
+            {#}#}
+        {#}#}
+    {#</script>#}
+{#{% endblock %}#}

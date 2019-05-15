@@ -1,0 +1,23 @@
+{
+    "name": "perfectneeds/media-bundle",
+    "description": "Media Bundle Manage images and documents",
+    "keywords": ["PerfectNeeds", "Media Bundle"],
+    "homepage": "http://perfectneeds.github.com",
+    "type": "symfony-library",
+    "authors": [
+        {
+            "name": "Peter Nassef",
+            "email": "peter.nassef@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^5.5.9 || ^7.0",
+        "symfony/framework-bundle": " ^3.4",
+        "perfectneeds/service-bundle": "^1.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "PN\\MediaBundle\\": ""
+        }
+    }
+}

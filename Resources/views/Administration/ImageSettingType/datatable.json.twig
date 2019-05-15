@@ -1,0 +1,19 @@
+{
+    "recordsTotal":
+    {{ recordsTotal }},
+    "recordsFiltered":
+    {{ recordsFiltered }},
+    "data": [
+        {% for imageSettingType in imageSettingTypes %}
+        [
+            "{{ imageSettingType.imageType.name }}",
+            "{% if imageSettingType.radioButton %}<span class='label label-flat border-success text-success-600'>Yes</span>{% else %}<span class='label label-flat border-danger text-danger-600'>No</span>{% endif %}",
+            " {% if imageSettingType.width == null and imageSettingType.height == null %}--{% elseif imageSettingType.width != null  and imageSettingType.height == null %}{{ imageSettingType.width }}px * --{% elseif imageSettingType.height != null and  imageSettingType.width == null %}-- * {{ imageSettingType.height }}px{% else %}{{ imageSettingType.width }}px * {{ imageSettingType.height }}px{% endif %}",
+            " {% if imageSettingType.thumbWidth == null and imageSettingType.thumbHeight == null %}--{% elseif imageSettingType.thumbWidth != null  and imageSettingType.thumbHeight == null %}{{ imageSettingType.thumbWidth }}px * --{% elseif imageSettingType.thumbHeight != null and  imageSettingType.thumbWidth == null %}-- * {{ imageSettingType.thumbHeight }}px{% else %}{{ imageSettingType.thumbWidth }}px * {{ imageSettingType.thumbHeight }}px{% endif %}",
+            " <ul class='icons-list'><li class='dropdown'><a href='#' class='dropdown-toggle' data-toggle='dropdown'><i class='icon-menu9'></i></a><ul class='dropdown-menu dropdown-menu-right'><li><a href='{{ path('imagesetting_type_edit',{'imageSettingId':imageSettingType.imageSetting.id,'imageTypeId':imageSettingType.imageType.id}) }}'><i class='icon-pencil7'></i> Edit</a></li><li><a href='#' class='delete-btn' data-toggle='modal' data-target='#modal_delete' data-delete='{{ path('imagesetting_type_delete',{'imageSettingId':imageSettingType.imageSetting.id,'imageTypeId':imageSettingType.imageType.id}) }}'><i class='icon-bin'></i> Remove</a></li></ul></li></ul>"
+        ]
+        {% if loop.last == false %},
+        {% endif %}
+        {% endfor %}
+    ]
+}

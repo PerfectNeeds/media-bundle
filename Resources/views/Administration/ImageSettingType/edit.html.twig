@@ -1,0 +1,48 @@
+{% extends 'adminTemplate/base.html.twig' %}
+{% import 'adminTemplate/macros.html.twig' as macros %}
+{% set page_title %}Edit {{ imageSettingHasType.imageSetting.entityName }} type{% endset %}
+
+{% block breadcrumb %}
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="{{ path('dashboard') }}"><i class="icon-home2 position-left"></i>Dashboard</a></li>
+            <li><a href="{{ path('imagesetting_index') }}">Image settings</a></li>
+            <li><a href="{{ path('imagesetting_type_index',{'id':imageSettingHasType.imageSetting.id}) }}">{{ imageSettingHasType.imageSetting.entityName }} types</a></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+{% endblock %}
+{% block body %}
+
+    {{ form_start(edit_form, {'attr':{'class':'form-validate-jquery','novalidate':'novalidate'}}) }}
+    <div class="panel panel-flat">
+        <div class="panel-body">
+            <div class="row">
+                {{ macros.input(edit_form.imageType, 6, null, null,'select-search select2-hidden-accessible') }}
+                {{ macros.checkbox(edit_form.radioButton) }}
+            </div>
+            <div class="row">
+                {{ macros.input(edit_form.width) }}
+                {{ macros.input(edit_form.height) }}
+            </div>
+            <div class="row">
+                {{ macros.input(edit_form.thumbWidth) }}
+                {{ macros.input(edit_form.thumbHeight) }}
+            </div>
+        </div>
+        <div class="panel-footer">
+            {% include 'adminTemplate/saveAndResetFormFooter.html.twig' %}
+        </div>
+    </div>
+
+    {{ form_end(edit_form) }}
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/validation/validate.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/pages/form_validation.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/styling/switchery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/selects/select2.min.js') }}"></script>
+
+{% endblock javascripts %}
