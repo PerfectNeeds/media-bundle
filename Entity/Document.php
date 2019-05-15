@@ -12,13 +12,6 @@ abstract class Document {
     private $filenameForRemove;
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     protected $name;
