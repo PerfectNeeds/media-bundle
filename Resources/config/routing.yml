@@ -1,0 +1,4 @@
+seo_admin:
+    resource: "@PNMediaBundle/Controller/Administration"
+    type:     annotation
+    prefix:   /admin/media

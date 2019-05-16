@@ -5,8 +5,8 @@ namespace PN\MediaBundle\Service;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
-use PN\MediaBundle\Entity\Document,
-    PN\MediaBundle\Service\DocumentPaths;
+use PN\MediaBundle\Service\DocumentPaths;
+use PN\ServiceBundle\Service\ContainerParameterService;
 
 /**
  * Upload Documents
@@ -16,17 +16,22 @@ use PN\MediaBundle\Entity\Document,
  */
 class UploadDocumentService {
 
-    private $allowMimeType = ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/mspowerpoint', 'application/powerpoint', 'application/vnd.ms-powerpoint', 'application/x-mspowerpoint', 'application/pdf', 'application/excel', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
-    protected $em;
-    protected $container;
-
-    public function getMimeTypes() {
-        return $this->allowMimeType;
-    }
+    private $allowMimeType = [];
+    private $documentClass;
+    private $documentPaths;
+    private $em;
+    private $container;
 
     public function __construct(ContainerInterface $container) {
         $this->container = $container;
         $this->em = $container->get('doctrine')->getManager();
+        $this->allowMimeType = $container->get(ContainerParameterService::class)->get('pn_media_document.mime_types');
+        $this->documentClass = $container->get(ContainerParameterService::class)->get('pn_media_document.document_class');
+        $this->documentPaths = $container->get(DocumentPaths::class);
+    }
+
+    public function getMimeTypes() {
+        return $this->allowMimeType;
     }
 
     public function uploadSingleDocumentByPath($entity, $path, $type, $request = null) {
@@ -67,7 +72,7 @@ class UploadDocumentService {
      * @return Document
      */
     private function uploadDocument(File $file, $uploadPath) {
-        $document = new Document();
+        $document = new $this->documentClass();
         $this->em->persist($document);
         $this->em->flush();
         $document->setFile($file);
@@ -99,10 +104,10 @@ class UploadDocumentService {
     }
 
     private function getUploadPath($type, $entity) {
-        if (!DocumentPaths::has($type)) {
+        if (!$this->documentPaths->has($type)) {
             return new \Exception("Document type is not exist");
         }
-        $uploadPath = DocumentPaths::get($type);
+        $uploadPath = $this->documentPaths->get($type);
         if (method_exists($entity->getId(), 'getId')) {
             $documentId = $entity->getId()->getId();
         } else {
@@ -149,7 +154,7 @@ class UploadDocumentService {
             $message = "Filetype not allowed";
             return $this->setFlashMessage($message, $request);
         }
-        if (!DocumentPaths::has($type)) {
+        if (!$this->documentPaths->has($type)) {
             $message = "invalid Document type";
             return $this->setFlashMessage($message, $request);
         }

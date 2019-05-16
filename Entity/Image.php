@@ -3,12 +3,21 @@
 namespace PN\MediaBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use PN\ServiceBundle\Lib\UploadPath;
 
 /**
  * @ORM\MappedSuperclass
  */
 abstract class Image {
 
+    const TYPE_TEMP = 0;
+    const TYPE_MAIN = 1;
+    const TYPE_GALLERY = 2;
+
+    private $imageTypes = [
+        self::TYPE_MAIN => "Main Image",
+        self::TYPE_GALLERY => "Gallery",
+    ];
     private $filenameForRemove;
     private $filenameForRemoveResize;
     private $id;
@@ -54,6 +63,10 @@ abstract class Image {
      */
     protected $imageType;
     protected $file;
+
+    public function getImageTypes() {
+        return $this->imageTypes;
+    }
 
     public function getUploadRootDirWithFileName() {
         // the absolute directory extension where uploaded with image name

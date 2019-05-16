@@ -14,15 +14,23 @@ use Symfony\Component\DependencyInjection\Loader;
  */
 class PNMediaExtension extends Extension {
 
+    private $alias = "pn_media";
+
     /**
      * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container) {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
+        $this->convertConfigToParameter($container, $config);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+    }
+
+    private function convertConfigToParameter(ContainerBuilder $container, $config) {
+        $container->setParameter($this->alias . '_image', $config['image']);
+        $container->setParameter($this->alias . '_document', $config['document']);
     }
 
 }

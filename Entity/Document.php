@@ -3,6 +3,7 @@
 namespace PN\MediaBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use PN\ServiceBundle\Lib\UploadPath;
 
 /**
  * @ORM\MappedSuperclass

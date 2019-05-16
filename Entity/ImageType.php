@@ -3,7 +3,6 @@
 namespace PN\MediaBundle\Entity;
 
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -44,7 +43,7 @@ class ImageType {
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId() {
         return $this->id;
@@ -65,7 +64,7 @@ class ImageType {
     /**
      * Get name
      *
-     * @return string 
+     * @return string
      */
     public function getName() {
         return $this->name;
@@ -95,7 +94,7 @@ class ImageType {
     /**
      * Get imageSettingTypes
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getImageSettingTypes() {
         return $this->imageSettingTypes;

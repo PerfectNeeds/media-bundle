@@ -8,11 +8,14 @@ services:
         # if you need to do this, you can override this setting on individual services
         public: true
         
-    upload_image:
-            class: PN\MediaBundle\Service\UploadImageService
-    upload_document:
-            class: PN\MediaBundle\Service\UploadDocumentService
+    pn_media_upload_image:
+        class: PN\MediaBundle\Service\UploadImageService
+    pn_media_upload_document:
+        class: PN\MediaBundle\Service\UploadDocumentService
 
+    PN\MediaBundle\Service\:
+        resource: '../../Service/*'
+    
     PN\MediaBundle\Twig\:
         public: false
         resource: '../../Twig/*'

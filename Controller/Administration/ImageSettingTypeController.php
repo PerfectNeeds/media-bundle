@@ -10,8 +10,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use PN\MediaBundle\Entity\ImageSettingHasType;
 
 /**
- * Image controller.
- *
  * @Route("/image-setting")
  */
 class ImageSettingTypeController extends Controller {
@@ -24,7 +22,7 @@ class ImageSettingTypeController extends Controller {
     public function indexAction(ImageSetting $imageSetting) {
         $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN');
 
-        return $this->render('MediaBundle:Administration/ImageSettingType:index.html.twig', ['imageSetting' => $imageSetting]);
+        return $this->render('PNMediaBundle:Administration/ImageSettingType:index.html.twig', ['imageSetting' => $imageSetting]);
     }
 
     /**
@@ -44,7 +42,7 @@ class ImageSettingTypeController extends Controller {
         $imageSettingHasType->setImageSetting($imageSetting);
 
 
-        $checkIfExist = $em->getRepository('MediaBundle:ImageSettingHasType')->findOneBy(array('imageSetting' => $imageSettingHasType->getImageSetting(), 'imageType' => $imageSettingHasType->getImageType()));
+        $checkIfExist = $em->getRepository('PNMediaBundle:ImageSettingHasType')->findOneBy(array('imageSetting' => $imageSettingHasType->getImageSetting(), 'imageType' => $imageSettingHasType->getImageType()));
         if ($checkIfExist != null) {
             $this->addFlash('error', 'This record is already exist');
         }
@@ -58,7 +56,7 @@ class ImageSettingTypeController extends Controller {
             return $this->redirectToRoute('imagesetting_type_index', ['id' => $imageSetting->getId()]);
         }
 
-        return $this->render('MediaBundle:Administration/ImageSettingType:new.html.twig', [
+        return $this->render('PNMediaBundle:Administration/ImageSettingType:new.html.twig', [
                     'entity' => $imageSetting,
                     'form' => $form->createView(),
                     'imageSetting' => $imageSetting,
@@ -73,7 +71,7 @@ class ImageSettingTypeController extends Controller {
      */
     public function editAction(Request $request, $imageSettingId, $imageTypeId) {
         $em = $this->getDoctrine()->getManager();
-        $imageSettingHasType = $em->getRepository('MediaBundle:ImageSettingHasType')->findOneBy(array('imageSetting' => $imageSettingId, 'imageType' => $imageTypeId));
+        $imageSettingHasType = $em->getRepository('PNMediaBundle:ImageSettingHasType')->findOneBy(array('imageSetting' => $imageSettingId, 'imageType' => $imageTypeId));
         if (!$imageSettingHasType) {
             throw $this->createNotFoundException();
         }
@@ -91,7 +89,7 @@ class ImageSettingTypeController extends Controller {
             return $this->redirect($this->generateUrl('imagesetting_type_edit', ['imageSettingId' => $imageSettingId, 'imageTypeId' => $imageTypeId]));
         }
 
-        return $this->render('MediaBundle:Administration/ImageSettingType:edit.html.twig', [
+        return $this->render('PNMediaBundle:Administration/ImageSettingType:edit.html.twig', [
                     'imageSettingHasType' => $imageSettingHasType,
                     'edit_form' => $editForm->createView(),
                         ]
@@ -105,7 +103,7 @@ class ImageSettingTypeController extends Controller {
      */
     public function deleteAction(Request $request, $imageSettingId, $imageTypeId) {
         $em = $this->getDoctrine()->getManager();
-        $imageSettingHasType = $em->getRepository('MediaBundle:ImageSettingHasType')->findOneBy(array('imageSetting' => $imageSettingId, 'imageType' => $imageTypeId));
+        $imageSettingHasType = $em->getRepository('PNMediaBundle:ImageSettingHasType')->findOneBy(array('imageSetting' => $imageSettingId, 'imageType' => $imageTypeId));
 
         if (!$imageSettingHasType) {
             throw $this->createNotFoundException('Unable to find ImageSettingHasType entity.');
@@ -134,10 +132,10 @@ class ImageSettingTypeController extends Controller {
         $search->ordr = $ordr[0];
         $search->imageSetting = $imageSetting->getId();
 
-        $count = $em->getRepository('MediaBundle:ImageSettingHasType')->filter($search, TRUE);
-        $imageSettingTypes = $em->getRepository('MediaBundle:ImageSettingHasType')->filter($search, FALSE, $start, $length);
+        $count = $em->getRepository('PNMediaBundle:ImageSettingHasType')->filter($search, TRUE);
+        $imageSettingTypes = $em->getRepository('PNMediaBundle:ImageSettingHasType')->filter($search, FALSE, $start, $length);
 
-        return $this->render("MediaBundle:Administration/ImageSettingType:datatable.json.twig", [
+        return $this->render("PNMediaBundle:Administration/ImageSettingType:datatable.json.twig", [
                     "recordsTotal" => $count,
                     "recordsFiltered" => $count,
                     "imageSettingTypes" => $imageSettingTypes,

@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use PN\MediaBundle\Entity\ImageSetting;
 use PN\MediaBundle\Form\ImageSettingType;
 use PN\ServiceBundle\Service\CommonFunctionService;
+use PN\ServiceBundle\Service\ContainerParameterService;
 
 /**
  * Image controller.
@@ -24,7 +25,22 @@ class ImageSettingController extends Controller {
     public function indexAction() {
         $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN');
 
-        return $this->render('MediaBundle:Administration/ImageSetting:index.html.twig');
+        $imageClass = $this->get(ContainerParameterService::class)->get('pn_media_image.image_class');
+        $image = new $imageClass();
+        $imageTypes = $image->getImageTypes();
+
+        $em = $this->getDoctrine()->getManager();
+        foreach ($imageTypes as $imageTypeId => $imageTypeTitle) {
+            $imageType = $em->getRepository('PNMediaBundle:ImageType')->find($imageTypeId);
+            if (!$imageType) {
+                $imageType = new \PN\MediaBundle\Entity\ImageType;
+                $imageType->setId($imageTypeId);
+                $imageType->setName($imageTypeTitle);
+                $em->persist($imageType);
+            }
+        }
+        $em->flush();
+        return $this->render('PNMediaBundle:Administration/ImageSetting:index.html.twig');
     }
 
     /**
@@ -53,10 +69,10 @@ class ImageSettingController extends Controller {
 
             $this->addFlash('success', 'Successfully saved');
 
-            return $this->redirect($this->generateUrl('imagesetting_index'));
+            return $this->redirectToRoute('imagesetting_index');
         }
 
-        return $this->render('MediaBundle:Administration/ImageSetting:new.html.twig', [
+        return $this->render('PNMediaBundle:Administration/ImageSetting:new.html.twig', [
                     'entity' => $imageSetting,
                     'form' => $form->createView(),
                         ]
@@ -84,10 +100,10 @@ class ImageSettingController extends Controller {
 
             $this->addFlash('success', 'Successfully updated');
 
-            return $this->redirect($this->generateUrl('imagesetting_edit', array('id' => $imageSetting->getId())));
+            return $this->redirectToRoute('imagesetting_edit', array('id' => $imageSetting->getId()));
         }
 
-        return $this->render('MediaBundle:Administration/ImageSetting:edit.html.twig', [
+        return $this->render('PNMediaBundle:Administration/ImageSetting:edit.html.twig', [
                     'imageSetting' => $imageSetting,
                     'edit_form' => $editForm->createView(),
                         ]
@@ -111,10 +127,10 @@ class ImageSettingController extends Controller {
         $search->string = $srch['value'];
         $search->ordr = $ordr[0];
 
-        $count = $em->getRepository('MediaBundle:ImageSetting')->filter($search, TRUE);
-        $imageSettings = $em->getRepository('MediaBundle:ImageSetting')->filter($search, FALSE, $start, $length);
+        $count = $em->getRepository('PNMediaBundle:ImageSetting')->filter($search, TRUE);
+        $imageSettings = $em->getRepository('PNMediaBundle:ImageSetting')->filter($search, FALSE, $start, $length);
 
-        return $this->render("MediaBundle:Administration/ImageSetting:datatable.json.twig", [
+        return $this->render("PNMediaBundle:Administration/ImageSetting:datatable.json.twig", [
                     "recordsTotal" => $count,
                     "recordsFiltered" => $count,
                     "imageSettings" => $imageSettings,

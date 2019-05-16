@@ -5,6 +5,7 @@ namespace PN\MediaBundle\Service;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
+use PN\ServiceBundle\Service\ContainerParameterService;
 use PN\MediaBundle\Entity\Image,
     PN\MediaBundle\Utils\SimpleImage,
     PN\MediaBundle\Entity\ImageSetting,
@@ -19,14 +20,19 @@ use PN\ServiceBundle\Utils\Slug;
  */
 class UploadImageService {
 
-    private $allowMimeType = array('image/gif', 'image/jpeg', 'image/jpg', 'image/png');
-    protected $em;
-    protected $container;
-    protected $imageSetting;
+    private $allowMimeType = [];
+    private $imageClass;
+    private $imagePaths;
+    private $em;
+    private $container;
+    private $imageSetting;
 
     public function __construct(ContainerInterface $container) {
         $this->container = $container;
         $this->em = $container->get('doctrine')->getManager();
+        $this->allowMimeType = $container->get(ContainerParameterService::class)->get('pn_media_image.mime_types');
+        $this->imageClass = $container->get(ContainerParameterService::class)->get('pn_media_image.image_class');
+        $this->imagePaths = $container->get(ImagePaths::class);
     }
 
     public function uploadSingleImageByPath($entity, $path, $type, $request = null, $imageType = Image::TYPE_MAIN) {
@@ -71,7 +77,7 @@ class UploadImageService {
      * @return Image
      */
     private function uploadImage(File $file, $imageType, $uploadPath, $imageName = null) {
-        $image = new Image();
+        $image = new $this->imageClass();
         $this->em->persist($image);
         $this->em->flush();
         $image->setFile($file);
@@ -124,11 +130,11 @@ class UploadImageService {
     }
 
     private function getUploadPath($type, $entity) {
-        if (!ImagePaths::has($type)) {
+        if (!$this->imagePaths->has($type)) {
             $imageSetting = $this->getImageSetting($type);
             $uploadPath = $imageSetting->getUploadPath();
         } else {
-            $uploadPath = ImagePaths::get($type);
+            $uploadPath = $this->imagePaths->get($type);
         }
 
         if (method_exists($entity->getId(), 'getId')) {
@@ -147,7 +153,7 @@ class UploadImageService {
      */
     private function getGeneratedImageName($type, $entity = null) {
         $generatedImageName = null;
-        if (!ImagePaths::has($type) and $entity !== null) {
+        if (!$this->imagePaths->has($type) and $entity !== null) {
 
             // if the entity instance of Post Entity
             if (get_class($entity) == "Post") {
@@ -187,7 +193,7 @@ class UploadImageService {
      * @return boolean
      */
     public function resizeImageAndCreateThumbnail(Image $image, $type, $imageType) {
-        if (ImagePaths::has($type)) {
+        if ($this->imagePaths->has($type)) {
             return false;
         }
         $imageSetting = $this->getImageSetting($type);
