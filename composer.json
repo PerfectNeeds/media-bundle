@@ -13,7 +13,7 @@
     "require": {
         "php": "^5.5.9 || ^7.0",
         "symfony/framework-bundle": " ^3.4",
-        "perfectneeds/service-bundle": "^1"
+        "perfectneeds/service-bundle": "~1.0"
     },
     "autoload": {
         "psr-4": {
