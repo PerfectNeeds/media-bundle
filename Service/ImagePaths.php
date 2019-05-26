@@ -15,7 +15,17 @@ class ImagePaths {
     private static $type = [];
 
     public function __construct(ContainerInterface $container) {
-        $uploadPaths = $container->get(ContainerParameterService::class)->get('pn_media_image.upload_paths');
+
+        $containerParameterService = $container->get(ContainerParameterService::class);
+
+        $uploadPaths = $containerParameterService->get('pn_media_image.upload_paths');
+
+
+        if ($containerParameterService->has('pn_content_image.upload_paths')) {
+            $contentBundleUploadPaths = $containerParameterService->get('pn_content_image.upload_paths');
+            $uploadPaths = array_merge($uploadPaths, $contentBundleUploadPaths);
+        }
+
         foreach ($uploadPaths as $uploadPath) {
             $id = $uploadPath['id'];
             $path = rtrim($uploadPath['path'], '/') . '/';

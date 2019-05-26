@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use PN\MediaBundle\Service\DocumentPaths;
+use PN\MediaBundle\Entity\Document;
 use PN\ServiceBundle\Service\ContainerParameterService;
 
 /**
