@@ -124,7 +124,7 @@ class UploadImageService {
      */
     private function getImageSetting($imageSettingId) {
         if ($this->imageSetting == null or $this->imageSetting->getId() != $imageSettingId) {
-            $this->imageSetting = $this->em->getRepository('MediaBundle:ImageSetting')->find($imageSettingId);
+            $this->imageSetting = $this->em->getRepository('PNMediaBundle:ImageSetting')->find($imageSettingId);
         }
         return $this->imageSetting;
     }
