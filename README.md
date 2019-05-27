@@ -24,7 +24,7 @@ Installation is a quick (I promise!) 9 step process:
 ### Step 1: Download PNMediaBundle using composer
 Require the bundle with composer:
 ```sh
-$ composer require perfectneeds/media-bundle "~1.*"
+$ composer require perfectneeds/media-bundle "~1.0"
 ```
 ### Step 2: Enable the Bundle in AppKernel
 Require the bundle with composer:
