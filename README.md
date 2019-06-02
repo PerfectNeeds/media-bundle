@@ -260,7 +260,7 @@ pn_media:
         mime_types: ['image/gif', 'image/jpeg', 'image/jpg', 'image/png']
         
         # Add here all upload paths for images that not managed by image setting and you'll path this id in upload method
-        # *IMPORTANT* this id must be greater than 100
+        # *IMPORTANT* this id must be greater than or equal 100
         upload_paths:
             - { id: 100, path: 'banner' }
             - { id: 100, path: 'banner' }

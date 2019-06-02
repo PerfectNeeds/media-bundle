@@ -64,6 +64,10 @@ abstract class Image {
     protected $imageType;
     protected $file;
 
+    public function __construct() {
+
+    }
+
     public function getImageTypes() {
         return $this->imageTypes;
     }
