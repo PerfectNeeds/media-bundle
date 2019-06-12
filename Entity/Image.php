@@ -84,7 +84,7 @@ abstract class Image {
     }
 
     public function getAssetPathThumb() {
-        return null === $this->name ? null : UploadPath::getUploadDir($this->getBasePath() . 'thumb/') . $this->getName();
+        return null === $this->name ? null : UploadPath::getUploadDir($this->getBasePath() . '/thumb/') . $this->getName();
     }
 
     public function preUpload($generatedImageName = NULL) {

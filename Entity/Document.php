@@ -28,6 +28,10 @@ abstract class Document {
     protected $size;
     protected $file;
 
+    public function __construct() {
+
+    }
+
     public function getUploadRootDirWithFileName() {
         // the absolute directory extension where uploaded with image name
         // documents should be saved

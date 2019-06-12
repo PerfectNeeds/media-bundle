@@ -22,7 +22,8 @@ class ImageRepository extends EntityRepository {
 
     public function clearMain($entityType, $entityId, $newImageType) {
         switch ($entityType) {
-            case("CMSBundle:Post"):
+            case "CMSBundle:Post":
+            case "PNContentBundle:Post":
                 $SQLTable = "post_image";
                 $SQLColumn = "t.post_id";
                 break;
