@@ -26,6 +26,7 @@ class UploadImageService {
     private $em;
     private $container;
     private $imageSetting;
+    private $tmpImage = null;
 
     public function __construct(ContainerInterface $container) {
         $this->container = $container;
@@ -33,6 +34,17 @@ class UploadImageService {
         $this->allowMimeType = $container->get(ContainerParameterService::class)->get('pn_media_image.mime_types');
         $this->imageClass = $container->get(ContainerParameterService::class)->get('pn_media_image.image_class');
         $this->imagePaths = $container->get(ImagePaths::class);
+    }
+
+    public function uploadSingleImageByUrl($entity, $url, $type, $request = null, $imageType = Image::TYPE_MAIN) {
+        $info = pathinfo($url);
+        $contents = file_get_contents($url);
+        $file = '/tmp/' . $info['basename'];
+        file_put_contents($file, $contents);
+        $this->tmpImage = $file;
+        $file = new File($file, $info['basename']);
+
+        return $this->uploadSingleImage($entity, $file, $type, $request, $imageType);
     }
 
     public function uploadSingleImageByPath($entity, $path, $type, $request = null, $imageType = Image::TYPE_MAIN) {
@@ -318,6 +330,12 @@ class UploadImageService {
 
         $this->em->remove($image);
         $this->em->flush();
+    }
+
+    private function removeTmpImage() {
+        if ($this->tmpImage != null) {
+
+        }
     }
 
 }
