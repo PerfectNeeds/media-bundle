@@ -225,7 +225,7 @@ class UploadImageService {
         } else {
             $imageSetting = $this->getImageSetting($type);
             $imageSettingWithType = $imageSetting->getTypeId($imageType);
-            if ($imageSettingWithType === null) {
+            if ($imageSettingWithType === false) {
                 return false;
             }
 
@@ -252,7 +252,7 @@ class UploadImageService {
 
         $imageSetting = $this->getImageSetting($type);
         $imageSettingWithType = $imageSetting->getTypeId($imageType);
-        if ($imageSettingWithType === null) {
+        if ($imageSettingWithType === false) {
             return false;
         }
         $originalPath = $image->getUploadRootDirWithFileName();
