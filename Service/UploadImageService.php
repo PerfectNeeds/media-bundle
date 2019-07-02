@@ -9,7 +9,8 @@ use PN\ServiceBundle\Service\ContainerParameterService;
 use PN\MediaBundle\Entity\Image,
     PN\MediaBundle\Utils\SimpleImage,
     PN\MediaBundle\Entity\ImageSetting,
-    PN\MediaBundle\Service\ImagePaths;
+    PN\MediaBundle\Service\ImagePaths,
+    PN\MediaBundle\Service\ImageDimension;
 use PN\ServiceBundle\Utils\Slug;
 
 /**
@@ -23,6 +24,7 @@ class UploadImageService {
     private $allowMimeType = [];
     private $imageClass;
     private $imagePaths;
+    private $imageDimensions;
     private $em;
     private $container;
     private $imageSetting;
@@ -34,6 +36,7 @@ class UploadImageService {
         $this->allowMimeType = $container->get(ContainerParameterService::class)->get('pn_media_image.mime_types');
         $this->imageClass = $container->get(ContainerParameterService::class)->get('pn_media_image.image_class');
         $this->imagePaths = $container->get(ImagePaths::class);
+        $this->imageDimensions = $container->get(ImageDimension::class);
     }
 
     public function uploadSingleImageByUrl($entity, $url, $type, $request = null, $imageType = Image::TYPE_MAIN) {
@@ -205,11 +208,8 @@ class UploadImageService {
      * @return boolean
      */
     public function resizeImageAndCreateThumbnail(Image $image, $type, $imageType) {
-        if ($this->imagePaths->has($type)) {
-            return false;
-        }
         $imageSetting = $this->getImageSetting($type);
-        if ($imageSetting->getAutoResize() == true and $imageType == Image::TYPE_MAIN) {
+        if (($imageSetting != null and $imageSetting->getAutoResize() == true) or $this->imageDimensions->has($type) == true) {
             $this->resizeOriginalImage($image, $type, $imageType);
             $this->createThumbnail($image, $type, $imageType);
         }
@@ -218,21 +218,27 @@ class UploadImageService {
     }
 
     private function resizeOriginalImage(Image $image, $type, $imageType) {
-        $imageSetting = $this->getImageSetting($type);
-        $imageSettingWithType = $imageSetting->getTypeId($imageType);
-        if ($imageSettingWithType === null) {
-            return false;
-        }
-
         $quality = 75;
-        if ($imageSetting->getQuality() == ImageSetting::ORIGINAL_RESOLUTION) {
-            $quality = 100;
+        if ($this->imageDimensions->has($type)) {
+            $widthDefault = $this->imageDimensions->getWidth($type);
+            $heightDefault = $this->imageDimensions->getHeight($type);
+        } else {
+            $imageSetting = $this->getImageSetting($type);
+            $imageSettingWithType = $imageSetting->getTypeId($imageType);
+            if ($imageSettingWithType === null) {
+                return false;
+            }
+
+            if ($imageSetting->getQuality() == ImageSetting::ORIGINAL_RESOLUTION) {
+                $quality = 100;
+            }
+            $widthDefault = $imageSettingWithType->getWidth();
+            $heightDefault = $imageSettingWithType->getHeight();
         }
 
         $originalPath = $image->getUploadRootDirWithFileName();
         list($width, $height) = getimagesize($originalPath);
-        $widthDefault = $imageSettingWithType->getWidth();
-        $heightDefault = $imageSettingWithType->getHeight();
+
 
         if (($widthDefault and $width > $widthDefault) || ($heightDefault and $height > $heightDefault)) {
             SimpleImage::saveNewResizedImage($originalPath, $originalPath, $widthDefault, $heightDefault, $quality);
@@ -240,6 +246,10 @@ class UploadImageService {
     }
 
     private function createThumbnail(Image $image, $type, $imageType) {
+        if ($this->imagePaths->has($type)) {
+            return false;
+        }
+
         $imageSetting = $this->getImageSetting($type);
         $imageSettingWithType = $imageSetting->getTypeId($imageType);
         if ($imageSettingWithType === null) {
@@ -330,12 +340,6 @@ class UploadImageService {
 
         $this->em->remove($image);
         $this->em->flush();
-    }
-
-    private function removeTmpImage() {
-        if ($this->tmpImage != null) {
-
-        }
     }
 
 }

@@ -46,6 +46,8 @@ class Configuration implements ConfigurationInterface {
                 ->children()
                 ->scalarNode('id')->end()
                 ->scalarNode('path')->end()
+                ->scalarNode('width')->end()
+                ->scalarNode('height')->end()
                 ->end()
                 ->end()
                 ->end()
