@@ -1,0 +1,2 @@
+{% set dimension = getDimension(type) %}
+Dimensions: {% if dimension.width is defined and dimension.width != null %}{{ dimension.width }}{% else %}--{% endif %} px * {% if dimension.height is defined and dimension.height != null %}{{ dimension.height }}{% else %}--{% endif %} px
