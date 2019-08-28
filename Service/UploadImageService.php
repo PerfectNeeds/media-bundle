@@ -72,6 +72,9 @@ class UploadImageService {
         // resize the image and create thumbnail if found a thumbnail sizes in ImageSetting
         $this->resizeImageAndCreateThumbnail($image, $type, $imageType);
 
+        $generatedImageAlt = $this->getGeneratedImageName($type, $entity);
+        $this->setImageAlt($image, $generatedImageAlt);
+
         if (method_exists($entity, 'addImage')) {
             $entity->addImage($image);
         } else {
@@ -160,6 +163,33 @@ class UploadImageService {
         return $uploadPath . 'image/' . date("Y/m");
     }
 
+    private function getClassName($object) {
+        $path = explode('\\', get_class($object));
+        return array_pop($path);
+    }
+
+    /**
+     *
+     * @param int $type
+     * @param type $entity
+     * @return string|null
+     */
+    private function getImageAlt($type, $entity = null) {
+        $generatedImageAlt = null;
+
+        if (!$this->imagePaths->has($type) and $entity !== null) {
+            // if the entity instance of Post Entity
+            $className = $this->getClassName($entity);
+            if ($className == "Post") {
+                $mainEntityId = $entity->getRelationalEntityId(); // Product, Category, etc
+                $imageSetting = $this->getImageSetting($type);
+                $entityName = $imageSetting->getEntityName();
+                $generatedImageAlt = $this->getRawName($entityName, $mainEntityId, false);
+            }
+        }
+        return $generatedImageAlt;
+    }
+
     /**
      *
      * @param int $type
@@ -168,17 +198,15 @@ class UploadImageService {
      */
     private function getGeneratedImageName($type, $entity = null) {
         $generatedImageName = null;
-        if (!$this->imagePaths->has($type) and $entity !== null) {
 
+        if (!$this->imagePaths->has($type) and $entity !== null) {
             // if the entity instance of Post Entity
-            if (get_class($entity) == "Post") {
+            $className = $this->getClassName($entity);
+            if ($className == "Post") {
                 $mainEntityId = $entity->getRelationalEntityId(); // Product, Category, etc
                 $imageSetting = $this->getImageSetting($type);
                 $entityName = $imageSetting->getEntityName();
                 $generatedImageName = $this->getRawName($entityName, $mainEntityId);
-            } else {
-                $reflect = new \ReflectionClass($entity);
-                $entityName = $reflect->getShortName();
             }
         }
         return $generatedImageName;
@@ -196,6 +224,15 @@ class UploadImageService {
         $image->setWidth($width);
         $image->setHeight($height);
         $image->setSize($size);
+        $this->em->persist($image);
+        $this->em->flush();
+    }
+
+    private function setImageAlt(Image $image, $alt = null) {
+        if ($alt == null) {
+            return false;
+        }
+        $image->setAlt($alt);
         $this->em->persist($image);
         $this->em->flush();
     }
@@ -296,7 +333,7 @@ class UploadImageService {
         return true;
     }
 
-    public function getRawName($entityName, $id = null) {
+    public function getRawName($entityName, $id = null, $sanitize = true) {
         if ($id == null or $entityName == null) {
             return null;
         }
@@ -319,12 +356,18 @@ class UploadImageService {
             return null;
         }
 
+        $title = null;
+
         if (method_exists($entity, "getTitle")) {
-            return Slug::sanitize($entity->getTitle());
+            $title = $entity->getTitle();
         } elseif (method_exists($entity, "getName")) {
-            return Slug::sanitize($entity->getName());
+            $title = $entity->getName();
         }
-        return null;
+
+        if ($sanitize == true and $title != null) {
+            return Slug::sanitize($title);
+        }
+        return $title;
     }
 
     public function deleteImage($entity, $image) {
