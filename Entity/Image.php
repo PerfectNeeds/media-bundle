@@ -76,7 +76,7 @@ abstract class Image {
         // the absolute directory extension where uploaded with image name
         // documents should be saved
         $directory = $this->getBasePath();
-        return UploadPath::getUploadRootDir($directory) . "/" . $this->getName();
+        return UploadPath::getUploadRootDir($directory) . $this->getName();
     }
 
     public function getAssetPath() {
@@ -144,7 +144,7 @@ abstract class Image {
         if ($directory == null) {
             $directory = $this->getBasePath();
         }
-        return null === $this->name ? null : UploadPath::getUploadRootDir($directory) . '/' . $this->name;
+        return null === $this->name ? null : UploadPath::getUploadRootDir($directory) . $this->name;
     }
 
     private function storeFilenameForRemove($directory = null) {
@@ -159,7 +159,7 @@ abstract class Image {
         if ($directory == null) {
             $directory = $this->getBasePath();
         }
-        $thumpPath = UploadPath::getUploadRootDir($directory) . '/thumb/';
+        $thumpPath = UploadPath::getUploadRootDir($directory) . 'thumb/';
         if (!file_exists($thumpPath)) {
             mkdir($thumpPath, 0777, TRUE);
         }
