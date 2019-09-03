@@ -72,7 +72,7 @@ class UploadImageService {
         // resize the image and create thumbnail if found a thumbnail sizes in ImageSetting
         $this->resizeImageAndCreateThumbnail($image, $type, $imageType);
 
-        $generatedImageAlt = $this->getGeneratedImageName($type, $entity);
+        $generatedImageAlt = $this->getImageAlt($type, $entity);
         $this->setImageAlt($image, $generatedImageAlt);
 
         if (method_exists($entity, 'addImage')) {
