@@ -17,7 +17,7 @@ class SingleDocumentType extends AbstractType {
 
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder->
-                add($this->name, 'file', array(
+                add($this->name, 'Symfony\Component\Form\Extension\Core\Type\FileType', array(
                     "required" => FALSE,
                     "attr" => array(
                         "accept" => "application/pdf|application/msword|application/vnd.openxmlformats-officedocument.wordprocessingml.document|application/vnd.ms-excel|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
