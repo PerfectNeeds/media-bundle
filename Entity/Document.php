@@ -32,6 +32,22 @@ abstract class Document {
 
     }
 
+    public function getRelationalEntity() {
+        $excludeMethods = ['id', "name", 'basePath', 'size', 'file', "filenameForRemove"];
+
+        $allObjects = get_object_vars($this);
+
+        foreach ($allObjects as $objectName => $objectValue) {
+            if (in_array($objectName, $excludeMethods)) {
+                continue;
+            }
+            if ($objectValue != NULL) {
+                return $objectValue;
+            }
+        }
+        return NULL;
+    }
+
     public function getUploadRootDirWithFileName() {
         // the absolute directory extension where uploaded with image name
         // documents should be saved

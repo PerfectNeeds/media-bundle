@@ -25,8 +25,19 @@ class DownloadController extends Controller {
     public function getDownloadNameAndPath() {
         $em = $this->getDoctrine()->getManager();
         $entity = $em->getRepository('MediaBundle:Document')->find($this->documentId);
+        $fileName = $entity->getName();
+        $orginalEntity = $entity->getRelationalEntity();
+        if ($orginalEntity) {
+            if (method_exists($orginalEntity, "getTitle")) {
+                $fileName = $orginalEntity->getTitle() . "." . $entity->getNameExtension();
+            } elseif (method_exists($orginalEntity, "getName")) {
+                $fileName = $orginalEntity->getName() . "." . $entity->getNameExtension();
+            }
+        }
         $return = new \stdClass();
-        $return->name = $entity->getName();
+
+
+        $return->name = $fileName;
         $return->path = $entity->getAssetPath();
         return $return;
     }
