@@ -262,7 +262,7 @@ pn_media:
         # Add here all upload paths for images that not managed by image setting and you'll path this id in upload method
         # *IMPORTANT* this id must be greater than or equal 100
         upload_paths:
-            - { id: 100, path: 'banner', width: 500, height: 500 }
+            - { id: 100, path: 'banner', width: 500, height: 500, validateWidthAndHeight: true }
             - { id: 101, path: 'testimonials', width: auto, height: auto }
             - { id: 102, path: 'our-reference' }
             

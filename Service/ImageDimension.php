@@ -31,6 +31,10 @@ class ImageDimension {
                 $width = $uploadPath['width'];
                 $nod['width'] = (is_numeric($width)) ? $width : null;
             }
+            if (array_key_exists('validateWidthAndHeight', $uploadPath)) {
+                $validateWidthAndHeight = $uploadPath['validateWidthAndHeight'];
+                $nod['validateWidthAndHeight'] = (is_bool($validateWidthAndHeight)) ? $validateWidthAndHeight : false;
+            }
             if (array_key_exists('height', $uploadPath)) {
                 $height = $uploadPath['height'];
                 $nod['height'] = (is_numeric($height)) ? $height : null;
@@ -68,6 +72,21 @@ class ImageDimension {
             return null;
         }
         return self::$type[$type]["height"];
+    }
+
+    /**
+     *
+     * @param type $type
+     * @return boolean
+     */
+    public static function getValidateWidthAndHeight($type) {
+        if (!array_key_exists($type, self::$type)) {
+            return false;
+        }
+        if (!array_key_exists("validateWidthAndHeight", self::$type[$type])) {
+            return false;
+        }
+        return self::$type[$type]["validateWidthAndHeight"];
     }
 
     /**

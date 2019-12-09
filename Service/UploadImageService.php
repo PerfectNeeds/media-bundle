@@ -56,7 +56,7 @@ class UploadImageService {
     }
 
     public function uploadSingleImage($entity, $file, $type, Request $request = null, $imageType = Image::TYPE_MAIN) {
-        $validate = $this->validate($file, $request);
+        $validate = $this->validate($file, $type, $imageType, $request);
         if ($validate !== true) {
             return $validate;
         }
@@ -317,7 +317,7 @@ class UploadImageService {
         }
     }
 
-    private function validate($file, Request $request = null) {
+    private function validate($file, $type, $imageType, Request $request = null) {
         if ($file === null) {
             return false;
         }
@@ -329,6 +329,49 @@ class UploadImageService {
         if (getimagesize($file->getRealPath()) == false) {
             $message = "invalid Image type";
             return $this->setFlashMessage($message, $request);
+        }
+
+        $imageSetting = $this->getImageSetting($type);
+
+        // validate image dimension
+        if ($imageSetting != null) {
+            $imageSettingWithType = $imageSetting->getTypeId($imageType);
+            if ($imageSettingWithType !== false and $imageSettingWithType->getValidateWidthAndHeight() == true) {
+                $height = $imageSettingWithType->getHeight();
+                $width = $imageSettingWithType->getWidth();
+
+                $validateImageDimension = $this->validateImageDimension($file, $width, $height);
+
+                if (!$validateImageDimension) {
+                    $message = "This image dimensions are wrong, please upload one with the right dimensions";
+                    return $this->setFlashMessage($message, $request);
+                }
+            }
+        }
+
+        if ($this->imageDimensions->has($type) == true AND $this->imageDimensions->getValidateWidthAndHeight($type) == true) {
+
+            $height = $this->imageDimensions->getHeight($type);
+            $width = $this->imageDimensions->getWidth($type);
+
+            $validateImageDimension = $this->validateImageDimension($file, $width, $height);
+
+            if (!$validateImageDimension) {
+                $message = "This image dimensions are wrong, please upload one with the right dimensions";
+                return $this->setFlashMessage($message, $request);
+            }
+        }
+        return true;
+    }
+
+    private function validateImageDimension($file, $width = null, $height = null) {
+        list($currentWidth, $currentHeight) = getimagesize($file->getRealPath());
+
+        if ($width != null and $currentWidth != $width) {
+            return false;
+        }
+        if ($height != null and $currentHeight != $height) {
+            return false;
         }
         return true;
     }
