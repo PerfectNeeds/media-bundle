@@ -2,16 +2,14 @@
 
 namespace PN\MediaBundle\Service;
 
+use PN\MediaBundle\Entity\Image;
+use PN\MediaBundle\Entity\ImageSetting;
+use PN\MediaBundle\Utils\SimpleImage;
+use PN\ServiceBundle\Service\ContainerParameterService;
+use PN\ServiceBundle\Utils\Slug;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
-use PN\ServiceBundle\Service\ContainerParameterService;
-use PN\MediaBundle\Entity\Image,
-    PN\MediaBundle\Utils\SimpleImage,
-    PN\MediaBundle\Entity\ImageSetting,
-    PN\MediaBundle\Service\ImagePaths,
-    PN\MediaBundle\Service\ImageDimension;
-use PN\ServiceBundle\Utils\Slug;
 
 /**
  * Upload image
@@ -23,6 +21,7 @@ class UploadImageService {
 
     private $allowMimeType = [];
     private $imageClass;
+    private $maxUploadSize = 1024; // 1MB
     private $imagePaths;
     private $imageDimensions;
     private $em;
@@ -57,6 +56,7 @@ class UploadImageService {
 
     public function uploadSingleImage($entity, $file, $type, Request $request = null, $imageType = Image::TYPE_MAIN) {
         $validate = $this->validate($file, $type, $imageType, $request);
+        dump($validate);
         if ($validate !== true) {
             return $validate;
         }
@@ -347,6 +347,14 @@ class UploadImageService {
                     return $this->setFlashMessage($message, $request);
                 }
             }
+            if ($imageSettingWithType !== false and $imageSettingWithType->getValidateSize() == true) {
+
+                $fileSize = $file->getSize();
+                if ($fileSize > $this->maxUploadSize) {
+                    $message = sprintf("The image uploaded must be max %s", "1MB");
+                    return $this->setFlashMessage($message, $request);
+                }
+            }
         }
 
         if ($this->imageDimensions->has($type) == true AND $this->imageDimensions->getValidateWidthAndHeight($type) == true) {
@@ -358,6 +366,15 @@ class UploadImageService {
 
             if (!$validateImageDimension) {
                 $message = "This image dimensions are wrong, please upload one with the right dimensions";
+                return $this->setFlashMessage($message, $request);
+            }
+        }
+        if ($this->imageDimensions->has($type) == true AND $this->imageDimensions->getValidateSize($type) == true) {
+
+            $fileSize = $file->getSize();
+
+            if ($fileSize > $this->maxUploadSize) {
+                $message = sprintf("The image uploaded must be max %s", "1MB");
                 return $this->setFlashMessage($message, $request);
             }
         }

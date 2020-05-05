@@ -49,6 +49,7 @@ class Configuration implements ConfigurationInterface {
                 ->scalarNode('width')->end()
                 ->scalarNode('height')->end()
                 ->scalarNode('validateWidthAndHeight')->end()
+                ->scalarNode('validateSize')->defaultValue(false)->end()
                 ->end()
                 ->end()
                 ->end()

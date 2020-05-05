@@ -18,9 +18,10 @@
     <div class="panel panel-flat">
         <div class="panel-body">
             <div class="row">
-                {{ macros.input(form.imageType, 6, null, null,'select-search select2-hidden-accessible') }}
+                {{ macros.input(form.imageType, 3, null, null,'select-search select2-hidden-accessible') }}
                  {{ macros.checkbox(form.radioButton, 3) }}
                  {{ macros.checkbox(form.validateWidthAndHeight, 3) }}
+                 {{ macros.checkbox(form.validateSize, 3) }}
             </div>
             <div class="row">
                 {{ macros.input(form.width) }}

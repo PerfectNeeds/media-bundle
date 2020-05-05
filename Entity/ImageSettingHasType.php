@@ -55,6 +55,11 @@ class ImageSettingHasType {
     protected $validateWidthAndHeight = true;
 
     /**
+     * @ORM\Column(name="validate_size", type="boolean")
+     */
+    protected $validateSize = true;
+
+    /**
      * Set width
      *
      * @param float $width
@@ -220,6 +225,27 @@ class ImageSettingHasType {
      */
     public function getValidateWidthAndHeight() {
         return $this->validateWidthAndHeight;
+    }
+
+    /**
+     * Set validateSize
+     *
+     * @param boolean $validateSize
+     * @return ImageSettingHasType
+     */
+    public function setValidateSize($validateSize) {
+        $this->validateSize = $validateSize;
+
+        return $this;
+    }
+
+    /**
+     * Get validateSize
+     *
+     * @return boolean
+     */
+    public function getValidateSize() {
+        return $this->validateSize;
     }
 
 }

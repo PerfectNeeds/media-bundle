@@ -94,6 +94,21 @@ class ImageDimension {
      * @param type $type
      * @return boolean
      */
+    public static function getValidateSize($type) {
+        if (!array_key_exists($type, self::$type)) {
+            return false;
+        }
+        if (!array_key_exists("validateSize", self::$type[$type])) {
+            return false;
+        }
+        return self::$type[$type]["validateSize"];
+    }
+
+    /**
+     *
+     * @param type $type
+     * @return boolean
+     */
     public static function has($type) {
         if (!array_key_exists($type, self::$type)) {
             return false;
