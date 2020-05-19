@@ -21,7 +21,7 @@ class UploadImageService {
 
     private $allowMimeType = [];
     private $imageClass;
-    private $maxUploadSize = 1024; // 1MB
+    private $maxUploadSize = 1024000; // 1MB
     private $imagePaths;
     private $imageDimensions;
     private $em;
