@@ -56,7 +56,6 @@ class UploadImageService {
 
     public function uploadSingleImage($entity, $file, $type, Request $request = null, $imageType = Image::TYPE_MAIN) {
         $validate = $this->validate($file, $type, $imageType, $request);
-        dump($validate);
         if ($validate !== true) {
             return $validate;
         }
