@@ -359,7 +359,7 @@ abstract class Image {
      *
      * @return integer
      */
-    protected function getId() {
+    public function getId() {
         return $this->id;
     }
 
