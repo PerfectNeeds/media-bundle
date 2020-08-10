@@ -210,17 +210,20 @@ class UploadDocumentService
         return true;
     }
 
-    public function deleteDocument($entity, $image)
+    public function deleteDocument($entity, $document, $objectName = null)
     {
-        if (method_exists($entity, 'removeDocument')) {
-            $entity->removeDocument($image);
+        $removeFunctionName = $this->getRemoveFunctionName($objectName);
+        if (method_exists($entity, $removeFunctionName)) {
+            $entity->{$removeFunctionName}($document);
         } else {
-            $entity->setDocument(null);
+            $setFunctionName = $this->getSetterFunctionName($objectName);
+            $entity->{$setFunctionName}(null);
         }
+
         $this->em->persist($entity);
         $this->em->flush();
 
-        $this->em->remove($image);
+        $this->em->remove($document);
         $this->em->flush();
     }
 
