@@ -2,8 +2,8 @@
 
 namespace PN\MediaBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -11,18 +11,22 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @Route("/download")
  */
-class DownloadController extends Controller {
+class DownloadController extends Controller
+{
 
     private $documentId; // document id from document Entity
 
-    public function __construct() {
+    public function __construct()
+    {
         $request = Request::createFromGlobals();
-        $getParameter = str_replace("'", '"', $request->query->get('d')); // ex: {{ path('download', {'d': '{"document":'document.id'}'}) }}
+        $getParameter = str_replace("'", '"',
+            $request->query->get('d')); // ex: {{ path('download', {'d': '{"document":'document.id'}'}) }}
         $parameter = json_decode($getParameter, true);
         $this->documentId = $parameter['document'];
     }
 
-    public function getDownloadNameAndPath() {
+    public function getDownloadNameAndPath()
+    {
         $em = $this->getDoctrine()->getManager();
         $entity = $em->getRepository('MediaBundle:Document')->find($this->documentId);
         if (!$entity) {
@@ -32,9 +36,9 @@ class DownloadController extends Controller {
         $originalEntity = $entity->getRelationalEntity();
         if ($originalEntity) {
             if (method_exists($originalEntity, "getTitle")) {
-                $fileName = $originalEntity->getTitle() . "." . $entity->getNameExtension();
+                $fileName = $originalEntity->getTitle().".".$entity->getNameExtension();
             } elseif (method_exists($originalEntity, "getName")) {
-                $fileName = $originalEntity->getName() . "." . $entity->getNameExtension();
+                $fileName = $originalEntity->getName().".".$entity->getNameExtension();
             }
         }
         $return = new \stdClass();
@@ -42,6 +46,7 @@ class DownloadController extends Controller {
 
         $return->name = $fileName;
         $return->path = $entity->getAssetPath();
+
         return $return;
     }
 
@@ -50,10 +55,12 @@ class DownloadController extends Controller {
      *
      * @Route("/", name="download", methods={"GET"})
      */
-    public function DownloadAction() {
+    public function DownloadAction()
+    {
         $nameAndPath = $this->getDownloadNameAndPath();
         $path = $nameAndPath->path;
-        $name = $nameAndPath->name;
+        $name = str_replace("/", "-", $nameAndPath->name);
+
         return $this->file($path, $name);
     }
 
