@@ -17,7 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
  * @author Peter Nassef <peter.nassef@perfectneeds.com>
  * @version 1.0
  */
-class UploadImageService {
+class UploadImageService
+{
 
     private $allowMimeType = [];
     private $imageClass;
@@ -29,7 +30,8 @@ class UploadImageService {
     private $imageSetting;
     private $tmpImage = null;
 
-    public function __construct(ContainerInterface $container) {
+    public function __construct(ContainerInterface $container)
+    {
         $this->container = $container;
         $this->em = $container->get('doctrine')->getManager();
         $this->allowMimeType = $container->get(ContainerParameterService::class)->get('pn_media_image.mime_types');
@@ -38,23 +40,45 @@ class UploadImageService {
         $this->imageDimensions = $container->get(ImageDimension::class);
     }
 
-    public function uploadSingleImageByUrl($entity, $url, $type, $request = null, $imageType = Image::TYPE_MAIN) {
+    public function uploadSingleImageByUrl(
+        $entity,
+        $url,
+        $type,
+        $request = null,
+        $imageType = Image::TYPE_MAIN,
+        $objectName = null
+    ) {
         $info = pathinfo($url);
         $contents = file_get_contents($url);
-        $file = '/tmp/' . $info['basename'];
+        $file = '/tmp/'.$info['basename'];
         file_put_contents($file, $contents);
         $this->tmpImage = $file;
         $file = new File($file, $info['basename']);
 
-        return $this->uploadSingleImage($entity, $file, $type, $request, $imageType);
+        return $this->uploadSingleImage($entity, $file, $type, $request, $imageType, $objectName);
     }
 
-    public function uploadSingleImageByPath($entity, $path, $type, $request = null, $imageType = Image::TYPE_MAIN) {
+    public function uploadSingleImageByPath(
+        $entity,
+        $path,
+        $type,
+        $request = null,
+        $imageType = Image::TYPE_MAIN,
+        $objectName = null
+    ) {
         $file = new File($path);
-        return $this->uploadSingleImage($entity, $file, $type, $request, $imageType);
+
+        return $this->uploadSingleImage($entity, $file, $type, $request, $imageType, $objectName);
     }
 
-    public function uploadSingleImage($entity, $file, $type, Request $request = null, $imageType = Image::TYPE_MAIN) {
+    public function uploadSingleImage(
+        $entity,
+        $file,
+        $type,
+        Request $request = null,
+        $imageType = Image::TYPE_MAIN,
+        $objectName = null
+    ) {
         $validate = $this->validate($file, $type, $imageType, $request);
         if ($validate !== true) {
             return $validate;
@@ -64,7 +88,7 @@ class UploadImageService {
         $uploadPath = $this->getUploadPath($type, $entity);
 
         // Remove old image if upload MainImage again
-        $this->removeOldImage($entity, $imageType);
+        $this->removeOldImage($entity, $imageType, $objectName);
 
         $image = $this->uploadImage($file, $imageType, $uploadPath, $generatedImageName);
 
@@ -74,14 +98,18 @@ class UploadImageService {
         $generatedImageAlt = $this->getImageAlt($type, $entity);
         $this->setImageAlt($image, $generatedImageAlt);
 
-        if (method_exists($entity, 'addImage')) {
-            $entity->addImage($image);
+
+        $addFunctionName = $this->getAddFunctionName($objectName);
+        if (method_exists($entity, $addFunctionName)) {
+            $entity->{$addFunctionName}($image);
         } else {
-            $entity->setImage($image);
+            $setFunctionName = $this->getSetterFunctionName($objectName);
+            $entity->{$setFunctionName}($image);
         }
 
         $this->em->persist($entity);
         $this->em->flush();
+
         return $image;
     }
 
@@ -93,7 +121,8 @@ class UploadImageService {
      * @param string $imageName
      * @return Image
      */
-    private function uploadImage(File $file, $imageType, $uploadPath, $imageName = null) {
+    private function uploadImage(File $file, $imageType, $uploadPath, $imageName = null)
+    {
         $image = new $this->imageClass();
         $this->em->persist($image);
         $this->em->flush();
@@ -101,6 +130,7 @@ class UploadImageService {
         $image->setImageType($imageType);
         $image->preUpload($imageName);
         $image->upload($uploadPath);
+
         return $image;
     }
 
@@ -111,26 +141,32 @@ class UploadImageService {
      * @param int $imageType (if MainImage, Gallery, etc..)
      * @return boolean Description
      */
-    private function removeOldImage($entity, $imageType) {
+    private function removeOldImage($entity, $imageType, $objectName)
+    {
         if ($imageType != Image::TYPE_MAIN) {
             return false;
         }
+        $oldImage = null;
+        $getFunctionName = $this->getGetterFunctionName($objectName);
         if (method_exists($entity, 'getImageByType')) {
             $oldImage = $entity->getImageByType($imageType);
-        } else {
-            $oldImage = $entity->getImage();
+        } elseif (!method_exists($entity, $getFunctionName)) {
+            $oldImage = $entity->{$getFunctionName}();
         }
 
         if ($oldImage) {
-            if (method_exists($entity, 'removeImage')) {
-                $entity->removeImage($oldImage);
+            $removeFunctionName = $this->getRemoveFunctionName($objectName);
+            if (method_exists($entity, $removeFunctionName)) {
+                $entity->{$removeFunctionName}($oldImage);
             } else {
-                $entity->setImage(null);
+                $setFunctionName = $this->getSetterFunctionName($objectName);
+                $entity->{$setFunctionName}(null);
             }
             $this->em->remove($oldImage);
             $this->em->persist($entity);
             $this->em->flush();
         }
+
         return true;
     }
 
@@ -139,14 +175,17 @@ class UploadImageService {
      * @param type $imageSettingId
      * @return ImageSetting
      */
-    private function getImageSetting($imageSettingId) {
+    private function getImageSetting($imageSettingId)
+    {
         if ($this->imageSetting == null or $this->imageSetting->getId() != $imageSettingId) {
             $this->imageSetting = $this->em->getRepository('PNMediaBundle:ImageSetting')->find($imageSettingId);
         }
+
         return $this->imageSetting;
     }
 
-    private function getUploadPath($type, $entity) {
+    private function getUploadPath($type, $entity)
+    {
         if (!$this->imagePaths->has($type)) {
             $imageSetting = $this->getImageSetting($type);
             $uploadPath = $imageSetting->getUploadPath();
@@ -159,11 +198,14 @@ class UploadImageService {
         } else {
             $imageId = $entity->getId();
         }
-        return $uploadPath . 'image/' . date("Y/m");
+
+        return $uploadPath.'image/'.date("Y/m");
     }
 
-    private function getClassName($object) {
+    private function getClassName($object)
+    {
         $path = explode('\\', get_class($object));
+
         return array_pop($path);
     }
 
@@ -173,7 +215,8 @@ class UploadImageService {
      * @param type $entity
      * @return string|null
      */
-    private function getImageAlt($type, $entity = null) {
+    private function getImageAlt($type, $entity = null)
+    {
         $generatedImageAlt = null;
 
         if (!$this->imagePaths->has($type) and $entity !== null) {
@@ -186,6 +229,7 @@ class UploadImageService {
                 $generatedImageAlt = $this->getRawName($entityName, $mainEntityId, false);
             }
         }
+
         return $generatedImageAlt;
     }
 
@@ -195,7 +239,8 @@ class UploadImageService {
      * @param type $entity
      * @return string|null
      */
-    private function getGeneratedImageName($type, $entity = null) {
+    private function getGeneratedImageName($type, $entity = null)
+    {
         $generatedImageName = null;
 
         if (!$this->imagePaths->has($type) and $entity !== null) {
@@ -208,6 +253,7 @@ class UploadImageService {
                 $generatedImageName = $this->getRawName($entityName, $mainEntityId);
             }
         }
+
         return $generatedImageName;
     }
 
@@ -216,7 +262,8 @@ class UploadImageService {
      *
      * @param Image $image
      */
-    private function setImageInfo(Image $image) {
+    private function setImageInfo(Image $image)
+    {
         $orginalPath = $image->getUploadRootDirWithFileName();
         $size = filesize($orginalPath);
         list($width, $height) = getimagesize($orginalPath);
@@ -227,7 +274,8 @@ class UploadImageService {
         $this->em->flush();
     }
 
-    private function setImageAlt(Image $image, $alt = null) {
+    private function setImageAlt(Image $image, $alt = null)
+    {
         if ($alt == null) {
             return false;
         }
@@ -243,17 +291,20 @@ class UploadImageService {
      * @param type $imageType MainImage, Gallery, etc...
      * @return boolean
      */
-    public function resizeImageAndCreateThumbnail(Image $image, $type, $imageType) {
+    public function resizeImageAndCreateThumbnail(Image $image, $type, $imageType)
+    {
         $imageSetting = $this->getImageSetting($type);
         if (($imageSetting != null and $imageSetting->getAutoResize() == true) or $this->imageDimensions->has($type) == true) {
             $this->resizeOriginalImage($image, $type, $imageType);
             $this->createThumbnail($image, $type, $imageType);
         }
         $this->setImageInfo($image);
-        return TRUE;
+
+        return true;
     }
 
-    private function resizeOriginalImage(Image $image, $type, $imageType) {
+    private function resizeOriginalImage(Image $image, $type, $imageType)
+    {
         $quality = 75;
         if ($this->imageDimensions->has($type)) {
             $widthDefault = $this->imageDimensions->getWidth($type);
@@ -281,7 +332,8 @@ class UploadImageService {
         }
     }
 
-    private function createThumbnail(Image $image, $type, $imageType) {
+    private function createThumbnail(Image $image, $type, $imageType)
+    {
         if ($this->imagePaths->has($type)) {
             return false;
         }
@@ -307,26 +359,31 @@ class UploadImageService {
      * @param Request $request
      * @return boolean
      */
-    private function setFlashMessage($message, Request $request = null) {
+    private function setFlashMessage($message, Request $request = null)
+    {
         if ($request != null) {
             $request->getSession()->getFlashBag()->add('error', $message);
+
             return false;
         } else {
             return $message;
         }
     }
 
-    private function validate($file, $type, $imageType, Request $request = null) {
+    private function validate($file, $type, $imageType, Request $request = null)
+    {
         if ($file === null) {
             return false;
         }
         $mimeType = $file->getMimeType();
         if (!in_array($mimeType, $this->allowMimeType)) {
             $message = "Filetype not allowed";
+
             return $this->setFlashMessage($message, $request);
         }
         if (getimagesize($file->getRealPath()) == false) {
             $message = "invalid Image type";
+
             return $this->setFlashMessage($message, $request);
         }
 
@@ -343,6 +400,7 @@ class UploadImageService {
 
                 if (!$validateImageDimension) {
                     $message = "This image dimensions are wrong, please upload one with the right dimensions";
+
                     return $this->setFlashMessage($message, $request);
                 }
             }
@@ -351,6 +409,7 @@ class UploadImageService {
                 $fileSize = $file->getSize();
                 if ($fileSize > $this->maxUploadSize) {
                     $message = sprintf("The image uploaded must be max %s", "1MB");
+
                     return $this->setFlashMessage($message, $request);
                 }
             }
@@ -365,6 +424,7 @@ class UploadImageService {
 
             if (!$validateImageDimension) {
                 $message = "This image dimensions are wrong, please upload one with the right dimensions";
+
                 return $this->setFlashMessage($message, $request);
             }
         }
@@ -374,13 +434,16 @@ class UploadImageService {
 
             if ($fileSize > $this->maxUploadSize) {
                 $message = sprintf("The image uploaded must be max %s", "1MB");
+
                 return $this->setFlashMessage($message, $request);
             }
         }
+
         return true;
     }
 
-    private function validateImageDimension($file, $width = null, $height = null) {
+    private function validateImageDimension($file, $width = null, $height = null)
+    {
         list($currentWidth, $currentHeight) = getimagesize($file->getRealPath());
 
         if ($width != null and $currentWidth != $width) {
@@ -389,10 +452,12 @@ class UploadImageService {
         if ($height != null and $currentHeight != $height) {
             return false;
         }
+
         return true;
     }
 
-    public function getRawName($entityName, $id = null, $sanitize = true) {
+    public function getRawName($entityName, $id = null, $sanitize = true)
+    {
         if ($id == null or $entityName == null) {
             return null;
         }
@@ -405,7 +470,7 @@ class UploadImageService {
                 continue;
             }
             $path = explode('\Entity\\', $entity);
-            $className = str_replace('\\', '', str_replace('PN\Bundle', '', $path[0])) . ':' . $path[1];
+            $className = str_replace('\\', '', str_replace('PN\Bundle', '', $path[0])).':'.$path[1];
         }
         if ($className == null) {
             return null;
@@ -426,10 +491,12 @@ class UploadImageService {
         if ($sanitize == true and $title != null) {
             return Slug::sanitize($title);
         }
+
         return $title;
     }
 
-    public function deleteImage($entity, $image) {
+    public function deleteImage($entity, $image)
+    {
 
 
         if (method_exists($entity, 'removeImage')) {
@@ -444,4 +511,31 @@ class UploadImageService {
         $this->em->flush();
     }
 
+    private function getGetterFunctionName($objectName = null)
+    {
+        $objectName = ($objectName == null) ? "Image" : $objectName;
+
+        return "get".ucfirst($objectName);
+    }
+
+    private function getSetterFunctionName($objectName = null)
+    {
+        $objectName = ($objectName == null) ? "Image" : $objectName;
+
+        return "set".ucfirst($objectName);
+    }
+
+    private function getAddFunctionName($objectName = null)
+    {
+        $objectName = ($objectName == null) ? "Image" : $objectName;
+
+        return "add".ucfirst($objectName);
+    }
+
+    private function getRemoveFunctionName($objectName = null)
+    {
+        $objectName = ($objectName == null) ? "Image" : $objectName;
+
+        return "remove".ucfirst($objectName);
+    }
 }

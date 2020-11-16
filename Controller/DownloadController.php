@@ -28,6 +28,9 @@ class DownloadController extends Controller
     public function getDownloadNameAndPath()
     {
         $em = $this->getDoctrine()->getManager();
+        if($this->documentId == null){
+            throw $this->createNotFoundException();
+        }
         $entity = $em->getRepository('MediaBundle:Document')->find($this->documentId);
         if (!$entity) {
             throw $this->createNotFoundException();
