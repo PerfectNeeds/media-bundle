@@ -150,7 +150,7 @@ class UploadImageService
         $getFunctionName = $this->getGetterFunctionName($objectName);
         if (method_exists($entity, 'getImageByType')) {
             $oldImage = $entity->getImageByType($imageType);
-        } elseif (!method_exists($entity, $getFunctionName)) {
+        } elseif (method_exists($entity, $getFunctionName)) {
             $oldImage = $entity->{$getFunctionName}();
         }
 
