@@ -116,6 +116,7 @@ abstract class Image {
 
         if ($this->filenameForRemoveResize) {
             if (file_exists($this->filenameForRemoveResize)) {
+                unlink($this->filenameForRemoveResize);
                 $folder = substr($this->filenameForRemoveResize, 0, strrpos($this->filenameForRemoveResize, '/') + 1);
                 $this->removeEmptySubFolders($folder);
             }
