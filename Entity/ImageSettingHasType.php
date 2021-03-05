@@ -13,13 +13,13 @@ use Doctrine\ORM\Mapping as ORM;
 class ImageSettingHasType {
 
     /**
-     * @ORM\Id 
+     * @ORM\Id
      * @ORM\ManyToOne(targetEntity="ImageType", inversedBy="imageSettingTypes", cascade={"persist"})
      */
     protected $imageType;
 
     /**
-     * @ORM\Id 
+     * @ORM\Id
      * @ORM\ManyToOne(targetEntity="ImageSetting", inversedBy="imageSettingTypes", cascade={"persist"})
      */
     protected $imageSetting;
@@ -50,6 +50,16 @@ class ImageSettingHasType {
     protected $thumbHeight = null;
 
     /**
+     * @ORM\Column(name="validate_width_and_height", type="boolean")
+     */
+    protected $validateWidthAndHeight = true;
+
+    /**
+     * @ORM\Column(name="validate_size", type="boolean")
+     */
+    protected $validateSize = true;
+
+    /**
      * Set width
      *
      * @param float $width
@@ -64,7 +74,7 @@ class ImageSettingHasType {
     /**
      * Get width
      *
-     * @return float 
+     * @return float
      */
     public function getWidth() {
         return $this->width;
@@ -85,7 +95,7 @@ class ImageSettingHasType {
     /**
      * Get height
      *
-     * @return float 
+     * @return float
      */
     public function getHeight() {
         return $this->height;
@@ -148,7 +158,7 @@ class ImageSettingHasType {
     /**
      * Get radioButton
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getRadioButton() {
         return $this->radioButton;
@@ -169,7 +179,7 @@ class ImageSettingHasType {
     /**
      * Get thumbWidth
      *
-     * @return float 
+     * @return float
      */
     public function getThumbWidth() {
         return $this->thumbWidth;
@@ -190,10 +200,52 @@ class ImageSettingHasType {
     /**
      * Get thumbHeight
      *
-     * @return float 
+     * @return float
      */
     public function getThumbHeight() {
         return $this->thumbHeight;
+    }
+
+    /**
+     * Set validateWidthAndHeight
+     *
+     * @param boolean $validateWidthAndHeight
+     * @return ImageSettingHasType
+     */
+    public function setValidateWidthAndHeight($validateWidthAndHeight) {
+        $this->validateWidthAndHeight = $validateWidthAndHeight;
+
+        return $this;
+    }
+
+    /**
+     * Get validateWidthAndHeight
+     *
+     * @return boolean
+     */
+    public function getValidateWidthAndHeight() {
+        return $this->validateWidthAndHeight;
+    }
+
+    /**
+     * Set validateSize
+     *
+     * @param boolean $validateSize
+     * @return ImageSettingHasType
+     */
+    public function setValidateSize($validateSize) {
+        $this->validateSize = $validateSize;
+
+        return $this;
+    }
+
+    /**
+     * Get validateSize
+     *
+     * @return boolean
+     */
+    public function getValidateSize() {
+        return $this->validateSize;
     }
 
 }

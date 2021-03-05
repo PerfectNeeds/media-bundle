@@ -24,7 +24,7 @@ Installation is a quick (I promise!) 9 step process:
 ### Step 1: Download PNMediaBundle using composer
 Require the bundle with composer:
 ```sh
-$ composer require perfectneeds/media-bundle "~1.*"
+$ composer require perfectneeds/media-bundle "~1.0"
 ```
 ### Step 2: Enable the Bundle in AppKernel
 Require the bundle with composer:
@@ -260,10 +260,11 @@ pn_media:
         mime_types: ['image/gif', 'image/jpeg', 'image/jpg', 'image/png']
         
         # Add here all upload paths for images that not managed by image setting and you'll path this id in upload method
-        # *IMPORTANT* this id must be greater than 100
+        # *IMPORTANT* this id must be greater than or equal 100
         upload_paths:
-            - { id: 100, path: 'banner' }
-            - { id: 100, path: 'banner' }
+            - { id: 100, path: 'banner', width: 500, height: 500, validateWidthAndHeight: true }
+            - { id: 101, path: 'testimonials', width: auto, height: auto }
+            - { id: 102, path: 'our-reference' }
             
     document:
         #The fully qualified class name (FQCN) of the Document class which you created in Step 4.

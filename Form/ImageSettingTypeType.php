@@ -27,6 +27,8 @@ class ImageSettingTypeType extends AbstractType {
                     'class' => ImageType::class
                 ])
                 ->add('radioButton', NULL, array('required' => false))
+                ->add('validateWidthAndHeight', NULL, array('required' => false))
+                ->add('validateSize', NULL, array('required' => false))
                 ->add('width', NULL, array('required' => false))
                 ->add('height', NULL, array('required' => false))
                 ->add('thumbWidth', NULL, array('required' => false))

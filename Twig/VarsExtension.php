@@ -11,6 +11,7 @@ class VarsExtension extends AbstractExtension {
     public function getFunctions() {
         return array(
             new TwigFunction('fileSizeConvert', array(VarsRuntime::class, 'fileSizeConvert')),
+            new TwigFunction('getDimension', array(VarsRuntime::class, 'getDimensionByType')),
         );
     }
 

@@ -34,7 +34,6 @@ class ImageSettingController extends Controller {
             $imageType = $em->getRepository('PNMediaBundle:ImageType')->find($imageTypeId);
             if (!$imageType) {
                 $imageType = new \PN\MediaBundle\Entity\ImageType;
-                $imageType->setId($imageTypeId);
                 $imageType->setName($imageTypeTitle);
                 $em->persist($imageType);
             }

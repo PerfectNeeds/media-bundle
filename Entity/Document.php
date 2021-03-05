@@ -28,6 +28,26 @@ abstract class Document {
     protected $size;
     protected $file;
 
+    public function __construct() {
+
+    }
+
+    public function getRelationalEntity() {
+        $excludeMethods = ['id', "name", 'basePath', 'size', 'file', "filenameForRemove"];
+
+        $allObjects = get_object_vars($this);
+
+        foreach ($allObjects as $objectName => $objectValue) {
+            if (in_array($objectName, $excludeMethods)) {
+                continue;
+            }
+            if ($objectValue != NULL) {
+                return $objectValue;
+            }
+        }
+        return NULL;
+    }
+
     public function getUploadRootDirWithFileName() {
         // the absolute directory extension where uploaded with image name
         // documents should be saved
@@ -41,10 +61,14 @@ abstract class Document {
 
     public function preUpload($generatedImageName = NULL) {
         if (null !== $this->file) {
+            $extension = $this->file->guessExtension();
+            if (method_exists($this->file, 'getClientOriginalExtension')) {
+                $extension = $this->file->getClientOriginalExtension();
+            }
             if ($generatedImageName != NULL) {
-                $this->name = $generatedImageName . '-' . $this->getId() . '.' . $this->file->guessExtension();
+                $this->name = $generatedImageName . '-' . $this->getId() . '.' . $extension;
             } else {
-                $this->name = $this->getId() . '.' . $this->file->guessExtension();
+                $this->name = $this->getId() . '.' . $extension;
             }
         }
     }
