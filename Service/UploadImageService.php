@@ -46,7 +46,8 @@ class UploadImageService
         $type,
         $request = null,
         $imageType = Image::TYPE_MAIN,
-        $objectName = null
+        $objectName = "Image",
+        $removeOldImage = false
     ) {
         $info = pathinfo($url);
         $contents = file_get_contents($url);
@@ -55,7 +56,7 @@ class UploadImageService
         $this->tmpImage = $file;
         $file = new File($file, $info['basename']);
 
-        return $this->uploadSingleImage($entity, $file, $type, $request, $imageType, $objectName);
+        return $this->uploadSingleImage($entity, $file, $type, $request, $imageType, $objectName, $removeOldImage);
     }
 
     public function uploadSingleImageByPath(
@@ -64,11 +65,12 @@ class UploadImageService
         $type,
         $request = null,
         $imageType = Image::TYPE_MAIN,
-        $objectName = null
+        $objectName = "Image",
+        $removeOldImage = false
     ) {
         $file = new File($path);
 
-        return $this->uploadSingleImage($entity, $file, $type, $request, $imageType, $objectName);
+        return $this->uploadSingleImage($entity, $file, $type, $request, $imageType, $objectName, $removeOldImage);
     }
 
     public function uploadSingleImage(
@@ -77,7 +79,8 @@ class UploadImageService
         $type,
         Request $request = null,
         $imageType = Image::TYPE_MAIN,
-        $objectName = null
+        $objectName = "Image",
+        $removeOldImage = false
     ) {
         $validate = $this->validate($file, $type, $imageType, $request);
         if ($validate !== true) {
@@ -88,7 +91,7 @@ class UploadImageService
         $uploadPath = $this->getUploadPath($type, $entity);
 
         // Remove old image if upload MainImage again
-        $this->removeOldImage($entity, $imageType, $objectName);
+        $this->removeOldImage($entity, $imageType, $objectName, $removeOldImage);
 
         $image = $this->uploadImage($file, $imageType, $uploadPath, $generatedImageName);
 
@@ -141,9 +144,9 @@ class UploadImageService
      * @param int $imageType (if MainImage, Gallery, etc..)
      * @return boolean Description
      */
-    private function removeOldImage($entity, $imageType, $objectName)
+    private function removeOldImage($entity, $imageType, $objectName, $removeOldImage)
     {
-        if ($imageType != Image::TYPE_MAIN) {
+        if (!$this->isDeleteOldImage($imageType, $removeOldImage)) {
             return false;
         }
         $oldImage = null;
@@ -168,6 +171,18 @@ class UploadImageService
         }
 
         return true;
+    }
+
+    private function isDeleteOldImage($imageType, $removeOldImage)
+    {
+        if ($imageType == Image::TYPE_MAIN) {
+            return true;
+        }
+        if ($removeOldImage) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
