@@ -37,14 +37,20 @@ class UploadDocumentService
         return $this->allowMimeType;
     }
 
-    public function uploadSingleDocumentByPath($entity, $path, $type, $request = null, array $mimeTypes = null)
-    {
+    public function uploadSingleDocumentByPath(
+        $entity,
+        $path,
+        $type,
+        $request = null,
+        array $mimeTypes = null,
+        $objectName = null
+    ) {
         if ($mimeTypes != null) {
             return $this->allowMimeType = $mimeTypes;
         }
         $file = new File($path);
 
-        return $this->uploadSingleDocument($entity, $file, $type, $request);
+        return $this->uploadSingleDocument($entity, $file, $type, $request, $objectName);
     }
 
     public function uploadSingleDocument(
