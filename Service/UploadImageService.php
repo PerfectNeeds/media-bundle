@@ -214,7 +214,7 @@ class UploadImageService
             $imageId = $entity->getId();
         }
 
-        return $uploadPath.'image/'.date("Y/m");
+        return date("Y/m/d")."/".$uploadPath.'image/';
     }
 
     private function getClassName($object)
@@ -430,7 +430,7 @@ class UploadImageService
             }
         }
 
-        if ($this->imageDimensions->has($type) == true AND $this->imageDimensions->getValidateWidthAndHeight($type) == true) {
+        if ($this->imageDimensions->has($type) == true and $this->imageDimensions->getValidateWidthAndHeight($type) == true) {
 
             $height = $this->imageDimensions->getHeight($type);
             $width = $this->imageDimensions->getWidth($type);
@@ -443,7 +443,7 @@ class UploadImageService
                 return $this->setFlashMessage($message, $request);
             }
         }
-        if ($this->imageDimensions->has($type) == true AND $this->imageDimensions->getValidateSize($type) == true) {
+        if ($this->imageDimensions->has($type) == true and $this->imageDimensions->getValidateSize($type) == true) {
 
             $fileSize = $file->getSize();
 
@@ -481,7 +481,7 @@ class UploadImageService
         $className = null;
         foreach ($entities as $entity) {
             $loopEntityName = substr($entity, strrpos($entity, '\\') + 1);
-            if (strpos($entity, 'PN\Bundle') === false OR $loopEntityName != $entityName) {
+            if (strpos($entity, 'PN\Bundle') === false or $loopEntityName != $entityName) {
                 continue;
             }
             $path = explode('\Entity\\', $entity);
