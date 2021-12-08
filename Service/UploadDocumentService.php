@@ -199,7 +199,7 @@ class UploadDocumentService
         }
     }
 
-    private function validate($file, $type, Request $request = null)
+    public function validate($file, $type, Request $request = null)
     {
         if ($file === null) {
             return false;

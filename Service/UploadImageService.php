@@ -385,7 +385,7 @@ class UploadImageService
         }
     }
 
-    private function validate($file, $type, $imageType, Request $request = null)
+    public function validate($file, $type, $imageType, Request $request = null)
     {
         if ($file === null) {
             return false;
