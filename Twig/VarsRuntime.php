@@ -2,27 +2,29 @@
 
 namespace PN\MediaBundle\Twig;
 
-use Twig\Extension\RuntimeExtensionInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use PN\MediaBundle\Service\ImageDimension;
+use Twig\Extension\RuntimeExtensionInterface;
 
-class VarsRuntime implements RuntimeExtensionInterface {
+class VarsRuntime implements RuntimeExtensionInterface
+{
 
-    private $container;
+    private $imageDimension;
 
-    public function __construct(ContainerInterface $container) {
-        $this->container = $container;
+    public function __construct(ImageDimension $imageDimension)
+    {
+        $this->imageDimension = $imageDimension;
     }
 
-    public function fileSizeConvert($bytes) {
+    public function fileSizeConvert($bytes)
+    {
         return \PN\ServiceBundle\Utils\General::fileSizeConvert($bytes);
     }
 
-    public function getDimensionByType($type) {
-        $imageDimensions = $this->container->get(ImageDimension::class);
+    public function getDimensionByType($type)
+    {
         return [
-            "width" => $imageDimensions->getWidth($type),
-            "height" => $imageDimensions->getHeight($type)
+            "width" => $this->imageDimensions->getWidth($type),
+            "height" => $this->imageDimensions->getHeight($type),
         ];
     }
 

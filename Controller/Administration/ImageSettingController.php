@@ -2,8 +2,11 @@
 
 namespace PN\MediaBundle\Controller\Administration;
 
+use Doctrine\ORM\EntityManagerInterface;
+use PN\MediaBundle\Entity\ImageType;
+use PN\ServiceBundle\Service\UserService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use PN\MediaBundle\Entity\ImageSetting;
 use PN\MediaBundle\Form\ImageSettingType;
@@ -15,31 +18,36 @@ use PN\ServiceBundle\Service\ContainerParameterService;
  *
  * @Route("/image-setting")
  */
-class ImageSettingController extends Controller {
+class ImageSettingController extends AbstractController
+{
 
     /**
      * Lists all ImageSetting entities.
      *
      * @Route("/", name="imagesetting_index", methods={"GET"})
      */
-    public function indexAction() {
+    public function indexAction(
+        Request $request,
+        ContainerParameterService $containerParameterService,
+        EntityManagerInterface $em
+    ) {
         $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN');
 
-        $imageClass = $this->get(ContainerParameterService::class)->get('pn_media_image.image_class');
+        $imageClass = $containerParameterService->get('pn_media_image.image_class');
         $image = new $imageClass();
         $imageTypes = $image->getImageTypes();
 
-        $em = $this->getDoctrine()->getManager();
         foreach ($imageTypes as $imageTypeId => $imageTypeTitle) {
             $imageType = $em->getRepository('PNMediaBundle:ImageType')->find($imageTypeId);
             if (!$imageType) {
-                $imageType = new \PN\MediaBundle\Entity\ImageType;
+                $imageType = new ImageType();
                 $imageType->setName($imageTypeTitle);
                 $em->persist($imageType);
             }
         }
         $em->flush();
-        return $this->render('PNMediaBundle:Administration/ImageSetting:index.html.twig');
+
+        return $this->render('@PNMedia/Administration/ImageSetting/index.html.twig');
     }
 
     /**
@@ -47,20 +55,25 @@ class ImageSettingController extends Controller {
      *
      * @Route("/new", name="imagesetting_new", methods={"GET", "POST"})
      */
-    public function newAction(Request $request) {
+    public function newAction(
+        Request $request,
+        UserService $userService,
+        CommonFunctionService $commonFunctionService,
+        EntityManagerInterface $em
+    ) {
         $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN');
 
 
-        $entities = $this->getEntitiesPostEntity();
-        $routers = $this->get(CommonFunctionService::class)->getAllEditRoutes();
+        $entities = $this->getEntitiesPostEntity($commonFunctionService);
+        $routers = $commonFunctionService->getAllEditRoutes();
 
         $imageSetting = new ImageSetting();
-        $form = $this->createForm(ImageSettingType::class, $imageSetting, ["entitiesNames" => $entities, "routes" => $routers]);
+        $form = $this->createForm(ImageSettingType::class, $imageSetting,
+            ["entitiesNames" => $entities, "routes" => $routers]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $userName = $this->get('user')->getUserName();
+            $userName = $userService->getUserName();
             $imageSetting->setCreator($userName);
             $imageSetting->setModifiedBy($userName);
             $em->persist($imageSetting);
@@ -71,10 +84,10 @@ class ImageSettingController extends Controller {
             return $this->redirectToRoute('imagesetting_index');
         }
 
-        return $this->render('PNMediaBundle:Administration/ImageSetting:new.html.twig', [
-                    'entity' => $imageSetting,
-                    'form' => $form->createView(),
-                        ]
+        return $this->render('@PNMedia/Administration/ImageSetting/new.html.twig', [
+                'entity' => $imageSetting,
+                'form' => $form->createView(),
+            ]
         );
     }
 
@@ -83,17 +96,23 @@ class ImageSettingController extends Controller {
      *
      * @Route("/{id}/edit", name="imagesetting_edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, ImageSetting $imageSetting) {
+    public function editAction(
+        Request $request,
+        ImageSetting $imageSetting,
+        UserService $userService,
+        CommonFunctionService $commonFunctionService,
+        EntityManagerInterface $em
+    ) {
 
-        $entities = $this->getEntitiesPostEntity();
-        $routers = $this->get(CommonFunctionService::class)->getAllEditRoutes();
-        $editForm = $this->createForm(ImageSettingType::class, $imageSetting, ["entitiesNames" => $entities, "routes" => $routers]);
+        $entities = $this->getEntitiesPostEntity($commonFunctionService);
+        $routers = $commonFunctionService->getAllEditRoutes();
+        $editForm = $this->createForm(ImageSettingType::class, $imageSetting,
+            ["entitiesNames" => $entities, "routes" => $routers]);
         $editForm->handleRequest($request);
 
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $userName = $this->get('user')->getUserName();
+            $userName = $userService->getUserName();
             $imageSetting->setModifiedBy($userName);
             $em->flush();
 
@@ -102,10 +121,10 @@ class ImageSettingController extends Controller {
             return $this->redirectToRoute('imagesetting_edit', array('id' => $imageSetting->getId()));
         }
 
-        return $this->render('PNMediaBundle:Administration/ImageSetting:edit.html.twig', [
-                    'imageSetting' => $imageSetting,
-                    'edit_form' => $editForm->createView(),
-                        ]
+        return $this->render('@PNMedia/Administration/ImageSetting/edit.html.twig', [
+                'imageSetting' => $imageSetting,
+                'edit_form' => $editForm->createView(),
+            ]
         );
     }
 
@@ -114,9 +133,8 @@ class ImageSettingController extends Controller {
      *
      * @Route("/data/table", defaults={"_format": "json"}, name="imagesetting_datatable", methods={"GET"})
      */
-    public function dataTableAction(Request $request) {
-        $em = $this->getDoctrine()->getManager();
-
+    public function dataTableAction(Request $request, EntityManagerInterface $em)
+    {
         $srch = $request->query->get("search");
         $start = $request->query->get("start");
         $length = $request->query->get("length");
@@ -126,19 +144,20 @@ class ImageSettingController extends Controller {
         $search->string = $srch['value'];
         $search->ordr = $ordr[0];
 
-        $count = $em->getRepository('PNMediaBundle:ImageSetting')->filter($search, TRUE);
-        $imageSettings = $em->getRepository('PNMediaBundle:ImageSetting')->filter($search, FALSE, $start, $length);
+        $count = $em->getRepository(ImageSetting::class)->filter($search, true);
+        $imageSettings = $em->getRepository(ImageSetting::class)->filter($search, false, $start, $length);
 
-        return $this->render("PNMediaBundle:Administration/ImageSetting:datatable.json.twig", [
-                    "recordsTotal" => $count,
-                    "recordsFiltered" => $count,
-                    "imageSettings" => $imageSettings,
-                        ]
+        return $this->render("@PNMedia/Administration/ImageSetting/datatable.json.twig", [
+                "recordsTotal" => $count,
+                "recordsFiltered" => $count,
+                "imageSettings" => $imageSettings,
+            ]
         );
     }
 
-    private function getEntitiesPostEntity() {
-        return $this->get(CommonFunctionService::class)->getEntitiesWithObject('post');
+    private function getEntitiesPostEntity(CommonFunctionService $commonFunctionService)
+    {
+        return $commonFunctionService->getEntitiesWithObject('post');
     }
 
 }

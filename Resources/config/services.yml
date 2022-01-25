@@ -1,21 +1,31 @@
 services:
-    _defaults:
-        # automatically injects dependencies in your services
-        autowire: true
-        # automatically registers your services as commands, event subscribers, etc.
-        autoconfigure: true
-        # this means you cannot fetch services directly from the container via $container->get()
-        # if you need to do this, you can override this setting on individual services
-        public: true
-        
-    pn_media_upload_image:
-        class: PN\MediaBundle\Service\UploadImageService
-    pn_media_upload_document:
-        class: PN\MediaBundle\Service\UploadDocumentService
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
 
-    PN\MediaBundle\Service\:
-        resource: '../../Service/*'
-    
-    PN\MediaBundle\Twig\:
-        public: false
-        resource: '../../Twig/*'
+  pn_media_upload_image:
+    class: PN\MediaBundle\Service\UploadImageService
+  pn_media_upload_document:
+    class: PN\MediaBundle\Service\UploadDocumentService
+
+  PN\MediaBundle\Service\:
+    resource: '../../Service/*'
+
+  PN\MediaBundle\Twig\:
+    public: false
+    resource: '../../Twig/*'
+
+  PN\MediaBundle\Controller\Administration\:
+    public: false
+    resource: '../../Controller/Administration/*'
+    tags: [ 'controller.service_arguments' ]
+
+  PN\MediaBundle\Controller\:
+    public: false
+    resource: '../../Controller/*'
+    tags: [ 'controller.service_arguments' ]
+
+  PN\MediaBundle\Repository\:
+    resource: '../../Repository/*'
+    tags: [ 'doctrine.repository_service' ]

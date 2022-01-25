@@ -2,7 +2,6 @@
 
 namespace PN\MediaBundle\Service;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use PN\ServiceBundle\Service\ContainerParameterService;
 
 /**
@@ -10,13 +9,13 @@ use PN\ServiceBundle\Service\ContainerParameterService;
  *
  * @author Peter Nassef <peter.nassef@perfectneeds.com>
  */
-class DocumentPaths {
+class DocumentPaths
+{
 
     private static $type = [];
 
-    public function __construct(ContainerInterface $container) {
-        $containerParameterService = $container->get(ContainerParameterService::class);
-
+    public function __construct(ContainerParameterService $containerParameterService)
+    {
         $uploadPaths = $containerParameterService->get('pn_media_document.upload_paths');
 
         if ($containerParameterService->has('pn_content_image.upload_paths')) {
@@ -26,7 +25,7 @@ class DocumentPaths {
 
         foreach ($uploadPaths as $uploadPath) {
             $id = $uploadPath['id'];
-            $path = rtrim($uploadPath['path'], '/') . '/';
+            $path = rtrim($uploadPath['path'], '/').'/';
             self::$type[$id] = $path;
         }
     }
@@ -35,10 +34,12 @@ class DocumentPaths {
      * @param type $type
      * @return type
      */
-    public static function get($type) {
+    public static function get($type)
+    {
         if (!array_key_exists($type, self::$type)) {
             return null;
         }
+
         return self::$type[$type];
     }
 
@@ -47,10 +48,12 @@ class DocumentPaths {
      * @param type $type
      * @return boolean
      */
-    public static function has($type) {
+    public static function has($type)
+    {
         if (!array_key_exists($type, self::$type)) {
             return false;
         }
+
         return true;
     }
 

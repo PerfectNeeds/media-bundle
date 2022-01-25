@@ -14,9 +14,7 @@ class ImagePaths {
 
     private static $type = [];
 
-    public function __construct(ContainerInterface $container) {
-
-        $containerParameterService = $container->get(ContainerParameterService::class);
+    public function __construct(ContainerParameterService $containerParameterService) {
 
         $uploadPaths = $containerParameterService->get('pn_media_image.upload_paths');
 

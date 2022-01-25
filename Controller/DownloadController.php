@@ -2,7 +2,9 @@
 
 namespace PN\MediaBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\ORM\EntityManagerInterface;
+use PN\MediaBundle\Entity\Document;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -11,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @Route("/download")
  */
-class DownloadController extends Controller
+class DownloadController extends AbstractController
 {
 
     private $documentId; // document id from document Entity
@@ -25,13 +27,12 @@ class DownloadController extends Controller
         $this->documentId = $parameter['document'];
     }
 
-    public function getDownloadNameAndPath()
+    public function getDownloadNameAndPath(EntityManagerInterface $em)
     {
-        $em = $this->getDoctrine()->getManager();
-        if($this->documentId == null){
+        if ($this->documentId == null) {
             throw $this->createNotFoundException();
         }
-        $entity = $em->getRepository('MediaBundle:Document')->find($this->documentId);
+        $entity = $em->getRepository(Document::class)->find($this->documentId);
         if (!$entity) {
             throw $this->createNotFoundException();
         }
@@ -58,12 +59,16 @@ class DownloadController extends Controller
      *
      * @Route("/", name="download", methods={"GET"})
      */
-    public function DownloadAction()
+    public function downloadAction(EntityManagerInterface $em)
     {
-        $nameAndPath = $this->getDownloadNameAndPath();
+        $nameAndPath = $this->getDownloadNameAndPath($em);
         $path = $nameAndPath->path;
         $name = str_replace("/", "-", $nameAndPath->name);
-
+        //        try {
+        //            return $this->file($path, $name);
+        //        } catch (\Exception $e) {
+        //            throw  $this->createNotFoundException();
+        //        }
         return $this->file($path, $name);
     }
 

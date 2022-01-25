@@ -2,12 +2,12 @@
 
 namespace PN\MediaBundle\Service;
 
+use Doctrine\ORM\EntityManagerInterface;
 use PN\MediaBundle\Entity\Image;
 use PN\MediaBundle\Entity\ImageSetting;
 use PN\MediaBundle\Utils\SimpleImage;
 use PN\ServiceBundle\Service\ContainerParameterService;
 use PN\ServiceBundle\Utils\Slug;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -30,14 +30,17 @@ class UploadImageService
     private $imageSetting;
     private $tmpImage = null;
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-        $this->em = $container->get('doctrine')->getManager();
-        $this->allowMimeType = $container->get(ContainerParameterService::class)->get('pn_media_image.mime_types');
-        $this->imageClass = $container->get(ContainerParameterService::class)->get('pn_media_image.image_class');
-        $this->imagePaths = $container->get(ImagePaths::class);
-        $this->imageDimensions = $container->get(ImageDimension::class);
+    public function __construct(
+        ContainerParameterService $containerParameterService,
+        EntityManagerInterface $em,
+        ImagePaths $imagePaths,
+        ImageDimension $imageDimension
+    ) {
+        $this->em = $em;
+        $this->allowMimeType = $containerParameterService->get('pn_media_image.mime_types');
+        $this->imageClass = $containerParameterService->get('pn_media_image.image_class');
+        $this->imagePaths = $imagePaths;
+        $this->imageDimensions = $imageDimension;
     }
 
     public function uploadSingleImageByUrl(

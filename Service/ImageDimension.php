@@ -14,9 +14,8 @@ class ImageDimension {
 
     private static $type = [];
 
-    public function __construct(ContainerInterface $container) {
+    public function __construct(ContainerParameterService $containerParameterService) {
 
-        $containerParameterService = $container->get(ContainerParameterService::class);
 
         $uploadPaths = $containerParameterService->get('pn_media_image.upload_paths');
 

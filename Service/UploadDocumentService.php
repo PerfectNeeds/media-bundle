@@ -2,9 +2,9 @@
 
 namespace PN\MediaBundle\Service;
 
+use Doctrine\ORM\EntityManagerInterface;
 use PN\MediaBundle\Entity\Document;
 use PN\ServiceBundle\Service\ContainerParameterService;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -21,15 +21,16 @@ class UploadDocumentService
     private $documentClass;
     private $documentPaths;
     private $em;
-    private $container;
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-        $this->em = $container->get('doctrine')->getManager();
-        $this->allowMimeType = $container->get(ContainerParameterService::class)->get('pn_media_document.mime_types');
-        $this->documentClass = $container->get(ContainerParameterService::class)->get('pn_media_document.document_class');
-        $this->documentPaths = $container->get(DocumentPaths::class);
+    public function __construct(
+        ContainerParameterService $containerParameterService,
+        EntityManagerInterface $em,
+        DocumentPaths $documentPaths
+    ) {
+        $this->em = $em;
+        $this->allowMimeType = $containerParameterService->get('pn_media_document.mime_types');
+        $this->documentClass = $containerParameterService->get('pn_media_document.document_class');
+        $this->documentPaths = $documentPaths;
     }
 
     public function getMimeTypes()

@@ -16,9 +16,6 @@ class PNMediaExtension extends Extension {
 
     private $alias = "pn_media";
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(array $configs, ContainerBuilder $container) {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
