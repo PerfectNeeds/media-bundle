@@ -25,9 +25,4 @@ class SingleImageType extends AbstractType {
                 ))
                 ->getForm();
     }
-
-    public function getBlockPrefix() {
-        return '';
-    }
-
 }

@@ -26,8 +26,4 @@ class SingleDocumentType extends AbstractType {
                 ->getForm();
     }
 
-    public function getBlockPrefix() {
-        return '';
-    }
-
 }

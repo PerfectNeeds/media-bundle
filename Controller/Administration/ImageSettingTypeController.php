@@ -132,10 +132,10 @@ class ImageSettingTypeController extends AbstractController
     public function dataTableAction(Request $request, ImageSetting $imageSetting, EntityManagerInterface $em): Response
     {
 
-        $srch = $request->query->get("search");
-        $start = $request->query->get("start");
-        $length = $request->query->get("length");
-        $ordr = $request->query->get("order");
+        $srch = $request->query->all("search");
+        $start = $request->query->getInt("start");
+        $length = $request->query->getInt("length");
+        $ordr = $request->query->all("order");
 
         $search = new \stdClass;
         $search->string = $srch['value'];
