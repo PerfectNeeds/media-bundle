@@ -45,7 +45,7 @@ class UploadDocumentService
         $request = null,
         array $mimeTypes = null,
         $objectName = null
-    ) {
+    ): Document|bool|array|string {
         if ($mimeTypes != null) {
             return $this->allowMimeType = $mimeTypes;
         }
@@ -62,7 +62,7 @@ class UploadDocumentService
         $objectName = null,
         array $mimeTypes = null,
         $removeOldImage = true
-    ) {
+    ): Document|bool|string {
         if ($mimeTypes != null) {
             $this->allowMimeType = $mimeTypes;
         }
@@ -102,7 +102,7 @@ class UploadDocumentService
      * @param string $uploadPath
      * @return Document
      */
-    private function uploadDocument(File $file, $uploadPath)
+    private function uploadDocument(File $file, string $uploadPath): Document
     {
         $document = new $this->documentClass();
         $this->em->persist($document);
@@ -124,7 +124,7 @@ class UploadDocumentService
      * @return bool
      * @throws \Exception
      */
-    private function removeOldDocument($entity, $objectName = null, $removeOldImage = true)
+    private function removeOldDocument($entity, $objectName = null, $removeOldImage = true): bool
     {
         if (!$removeOldImage) {
             return false;
@@ -159,11 +159,11 @@ class UploadDocumentService
             return new \Exception("Document type is not exist");
         }
         $uploadPath = $this->documentPaths->get($type);
-        if (method_exists($entity->getId(), 'getId')) {
-            $documentId = $entity->getId()->getId();
-        } else {
-            $documentId = $entity->getId();
-        }
+//        if (is_object($entity->getId()) and method_exists($entity->getId(), 'getId')) {
+//            $documentId = $entity->getId()->getId();
+//        } else {
+//            $documentId = $entity->getId();
+//        }
 
         return date("Y/m/d")."/".$uploadPath.'document';
     }
@@ -189,7 +189,7 @@ class UploadDocumentService
      * @param Request $request
      * @return boolean
      */
-    private function setFlashMessage($message, Request $request = null)
+    private function setFlashMessage(string $message, Request $request = null): bool|string
     {
         if ($request != null) {
             $request->getSession()->getFlashBag()->add('error', $message);
@@ -200,7 +200,7 @@ class UploadDocumentService
         }
     }
 
-    public function validate($file, $type, Request $request = null)
+    public function validate($file, $type, Request $request = null): bool|string
     {
         if ($file === null) {
             return false;
@@ -241,28 +241,28 @@ class UploadDocumentService
         $this->em->flush();
     }
 
-    private function getGetterFunctionName($objectName = null)
+    private function getGetterFunctionName($objectName = null): string
     {
         $objectName = ($objectName == null) ? "Document" : $objectName;
 
         return "get".ucfirst($objectName);
     }
 
-    private function getSetterFunctionName($objectName = null)
+    private function getSetterFunctionName($objectName = null): string
     {
         $objectName = ($objectName == null) ? "Document" : $objectName;
 
         return "set".ucfirst($objectName);
     }
 
-    private function getAddFunctionName($objectName = null)
+    private function getAddFunctionName($objectName = null): string
     {
         $objectName = ($objectName == null) ? "Document" : $objectName;
 
         return "add".ucfirst($objectName);
     }
 
-    private function getRemoveFunctionName($objectName = null)
+    private function getRemoveFunctionName($objectName = null): string
     {
         $objectName = ($objectName == null) ? "Document" : $objectName;
 

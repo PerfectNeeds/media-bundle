@@ -51,7 +51,7 @@ class UploadImageService
         $imageType = Image::TYPE_MAIN,
         $objectName = "Image",
         $removeOldImage = false
-    ) {
+    ): bool|string|Image {
         $info = pathinfo($url);
         $contents = file_get_contents($url);
         $file = '/tmp/'.$info['basename'];
@@ -70,7 +70,7 @@ class UploadImageService
         $imageType = Image::TYPE_MAIN,
         $objectName = "Image",
         $removeOldImage = false
-    ) {
+    ): bool|string|Image {
         $file = new File($path);
 
         return $this->uploadSingleImage($entity, $file, $type, $request, $imageType, $objectName, $removeOldImage);
@@ -127,7 +127,7 @@ class UploadImageService
      * @param string $imageName
      * @return Image
      */
-    private function uploadImage(File $file, $imageType, $uploadPath, $imageName = null)
+    private function uploadImage(File $file, $imageType, $uploadPath, $imageName = null): Image
     {
         $image = new $this->imageClass();
         $this->em->persist($image);
@@ -147,7 +147,7 @@ class UploadImageService
      * @param int $imageType (if MainImage, Gallery, etc..)
      * @return boolean Description
      */
-    private function removeOldImage($entity, $imageType, $objectName, $removeOldImage)
+    private function removeOldImage($entity, $imageType, $objectName, $removeOldImage): bool
     {
         if (!$this->isDeleteOldImage($imageType, $removeOldImage)) {
             return false;
@@ -176,7 +176,7 @@ class UploadImageService
         return true;
     }
 
-    private function isDeleteOldImage($imageType, $removeOldImage)
+    private function isDeleteOldImage($imageType, $removeOldImage): bool
     {
         if ($imageType == Image::TYPE_MAIN) {
             return true;
@@ -193,16 +193,16 @@ class UploadImageService
      * @param type $imageSettingId
      * @return ImageSetting
      */
-    private function getImageSetting($imageSettingId)
+    private function getImageSetting($imageSettingId): ?ImageSetting
     {
         if ($this->imageSetting == null or $this->imageSetting->getId() != $imageSettingId) {
-            $this->imageSetting = $this->em->getRepository('PNMediaBundle:ImageSetting')->find($imageSettingId);
+            $this->imageSetting = $this->em->getRepository(ImageSetting::class)->find($imageSettingId);
         }
 
         return $this->imageSetting;
     }
 
-    private function getUploadPath($type, $entity)
+    private function getUploadPath($type, $entity): string
     {
         if (!$this->imagePaths->has($type)) {
             $imageSetting = $this->getImageSetting($type);
@@ -211,16 +211,16 @@ class UploadImageService
             $uploadPath = $this->imagePaths->get($type);
         }
 
-        if (method_exists($entity->getId(), 'getId')) {
-            $imageId = $entity->getId()->getId();
-        } else {
-            $imageId = $entity->getId();
-        }
+        //        if (is_object($entity->getId()) and method_exists($entity->getId(), 'getId')) {
+        //            $imageId = $entity->getId()->getId();
+        //        } else {
+        //            $imageId = $entity->getId();
+        //        }
 
         return date("Y/m/d")."/".$uploadPath.'image';
     }
 
-    private function getClassName($object)
+    private function getClassName($object): ?string
     {
         $path = explode('\\', get_class($object));
 
@@ -233,7 +233,7 @@ class UploadImageService
      * @param type $entity
      * @return string|null
      */
-    private function getImageAlt($type, $entity = null)
+    private function getImageAlt($type, $entity = null): ?string
     {
         $generatedImageAlt = null;
 
@@ -253,11 +253,11 @@ class UploadImageService
 
     /**
      *
-     * @param int $type
-     * @param type $entity
+     * @param string $type
+     * @param string $entity
      * @return string|null
      */
-    private function getGeneratedImageName($type, $entity = null)
+    private function getGeneratedImageName(string $type, $entity = null): ?string
     {
         $generatedImageName = null;
 
@@ -282,9 +282,9 @@ class UploadImageService
      */
     private function setImageInfo(Image $image)
     {
-        $orginalPath = $image->getUploadRootDirWithFileName();
-        $size = filesize($orginalPath);
-        list($width, $height) = getimagesize($orginalPath);
+        $originalPath = $image->getUploadRootDirWithFileName();
+        $size = filesize($originalPath);
+        list($width, $height) = getimagesize($originalPath);
         $image->setWidth($width);
         $image->setHeight($height);
         $image->setSize($size);
@@ -292,10 +292,10 @@ class UploadImageService
         $this->em->flush();
     }
 
-    private function setImageAlt(Image $image, $alt = null)
+    private function setImageAlt(Image $image, $alt = null): void
     {
         if ($alt == null) {
-            return false;
+            return;
         }
         $image->setAlt($alt);
         $this->em->persist($image);
@@ -309,7 +309,7 @@ class UploadImageService
      * @param type $imageType MainImage, Gallery, etc...
      * @return boolean
      */
-    public function resizeImageAndCreateThumbnail(Image $image, $type, $imageType)
+    public function resizeImageAndCreateThumbnail(Image $image, $type, $imageType): bool
     {
         $imageSetting = $this->getImageSetting($type);
         if (($imageSetting != null and $imageSetting->getAutoResize() == true) or $this->imageDimensions->has($type) == true) {
@@ -321,7 +321,7 @@ class UploadImageService
         return true;
     }
 
-    private function resizeOriginalImage(Image $image, $type, $imageType)
+    private function resizeOriginalImage(Image $image, $type, $imageType): void
     {
         $quality = 75;
         if ($this->imageDimensions->has($type)) {
@@ -331,7 +331,7 @@ class UploadImageService
             $imageSetting = $this->getImageSetting($type);
             $imageSettingWithType = $imageSetting->getTypeId($imageType);
             if ($imageSettingWithType === false) {
-                return false;
+                return;
             }
 
             if ($imageSetting->getQuality() == ImageSetting::ORIGINAL_RESOLUTION) {
@@ -350,16 +350,16 @@ class UploadImageService
         }
     }
 
-    private function createThumbnail(Image $image, $type, $imageType)
+    private function createThumbnail(Image $image, $type, $imageType): void
     {
         if ($this->imagePaths->has($type)) {
-            return false;
+            return;
         }
 
         $imageSetting = $this->getImageSetting($type);
         $imageSettingWithType = $imageSetting->getTypeId($imageType);
         if ($imageSettingWithType === false) {
-            return false;
+            return;
         }
         $originalPath = $image->getUploadRootDirWithFileName();
         $thumbWidthDefault = $imageSettingWithType->getThumbWidth();
@@ -377,7 +377,7 @@ class UploadImageService
      * @param Request $request
      * @return boolean
      */
-    private function setFlashMessage($message, Request $request = null)
+    private function setFlashMessage($message, Request $request = null): bool|string
     {
         if ($request != null) {
             $request->getSession()->getFlashBag()->add('error', $message);
@@ -388,7 +388,7 @@ class UploadImageService
         }
     }
 
-    public function validate($file, $type, $imageType, Request $request = null)
+    public function validate($file, $type, $imageType, Request $request = null): bool|string
     {
         if ($file === null) {
             return false;
@@ -460,7 +460,7 @@ class UploadImageService
         return true;
     }
 
-    private function validateImageDimension($file, $width = null, $height = null)
+    private function validateImageDimension($file, $width = null, $height = null): bool
     {
         list($currentWidth, $currentHeight) = getimagesize($file->getRealPath());
 
@@ -474,7 +474,7 @@ class UploadImageService
         return true;
     }
 
-    public function getRawName($entityName, $id = null, $sanitize = true)
+    public function getRawName($entityName, $id = null, $sanitize = true): ?string
     {
         if ($id == null or $entityName == null) {
             return null;
@@ -513,10 +513,8 @@ class UploadImageService
         return $title;
     }
 
-    public function deleteImage($entity, $image)
+    public function deleteImage($entity, $image): void
     {
-
-
         if (method_exists($entity, 'removeImage')) {
             $entity->removeImage($image);
         } else {
@@ -529,28 +527,28 @@ class UploadImageService
         $this->em->flush();
     }
 
-    private function getGetterFunctionName($objectName = null)
+    private function getGetterFunctionName($objectName = null): string
     {
         $objectName = ($objectName == null) ? "Image" : $objectName;
 
         return "get".ucfirst($objectName);
     }
 
-    private function getSetterFunctionName($objectName = null)
+    private function getSetterFunctionName($objectName = null): string
     {
         $objectName = ($objectName == null) ? "Image" : $objectName;
 
         return "set".ucfirst($objectName);
     }
 
-    private function getAddFunctionName($objectName = null)
+    private function getAddFunctionName($objectName = null): string
     {
         $objectName = ($objectName == null) ? "Image" : $objectName;
 
         return "add".ucfirst($objectName);
     }
 
-    private function getRemoveFunctionName($objectName = null)
+    private function getRemoveFunctionName($objectName = null): string
     {
         $objectName = ($objectName == null) ? "Image" : $objectName;
 
