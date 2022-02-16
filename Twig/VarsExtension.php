@@ -3,6 +3,7 @@
 namespace PN\MediaBundle\Twig;
 
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 class VarsExtension extends AbstractExtension
@@ -13,6 +14,13 @@ class VarsExtension extends AbstractExtension
         return [
             new TwigFunction('fileSizeConvert', [VarsRuntime::class, 'fileSizeConvert']),
             new TwigFunction('getDimension', [VarsRuntime::class, 'getDimensionByType']),
+        ];
+    }
+
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('webp', [VarsRuntime::class, 'setWebpExtension']),
         ];
     }
 
