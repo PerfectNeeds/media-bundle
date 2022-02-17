@@ -43,6 +43,11 @@ class VarsRuntime implements RuntimeExtensionInterface
         $projectDir = $this->parameterBag->get("kernel.project_dir");
         $publicDirectory = rtrim(UploadPath::getWebRoot(), '/');
 
+        $originalFilePath = $filePath;
+        if (strpos($filePath, $publicDirectory) !== false) {
+            $filePath = substr($filePath, strpos($filePath, $publicDirectory) + strlen($publicDirectory));
+        }
+
         $fullFilePath = "{$projectDir}/{$publicDirectory}{$filePath}";
 
         if ($returnEmptyOnException && !file_exists($fullFilePath)) {
@@ -51,7 +56,13 @@ class VarsRuntime implements RuntimeExtensionInterface
 
         $webPPath = (new ImageWebPConverter())->convertImageToWebPAndCache($fullFilePath);
 
-        return explode("{$projectDir}/{$publicDirectory}", $webPPath, 2)[1];
+        $assetPath = explode("{$projectDir}/{$publicDirectory}", $webPPath, 2)[1];
+        if (strpos($originalFilePath, $publicDirectory) !== false) {
+            $baseAssetPath = substr($originalFilePath, 0, strpos($originalFilePath, $publicDirectory)+ strlen($publicDirectory));
+            $assetPath  = $baseAssetPath.$assetPath;
+        }
+        
+        return $assetPath;
     }
 
 }
