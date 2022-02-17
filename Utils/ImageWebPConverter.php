@@ -68,6 +68,7 @@ class ImageWebPConverter
     {
         if ($extension === 'png') {
             $imageResource = imagecreatefrompng($path);
+            imageinterlace($imageResource, false);
         } elseif ($extension === 'jpeg' || $extension === 'jpg') {
             $imageResource = imagecreatefromjpeg($path);
         } elseif ($extension === 'bmp') {
