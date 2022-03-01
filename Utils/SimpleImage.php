@@ -22,29 +22,32 @@
 
 namespace PN\MediaBundle\Utils;
 
-class SimpleImage {
+class SimpleImage
+{
 
-    var $image;
-    var $image_type;
+    private static $image;
+    private static $imageType;
 
-    function load($filename) {
+    private static function load($filename): void
+    {
         $image_info = getimagesize($filename);
-        $this->image_type = $image_info[2];
-        if ($this->image_type == IMAGETYPE_JPEG) {
-            $this->image = imagecreatefromjpeg($filename);
-        } elseif ($this->image_type == IMAGETYPE_GIF) {
-            $this->image = imagecreatefromgif($filename);
-        } elseif ($this->image_type == IMAGETYPE_PNG) {
-            $this->image = imagecreatefrompng($filename);
+        self::$imageType = $image_info[2];
+        if (self::$imageType == IMAGETYPE_JPEG) {
+            self::$image = imagecreatefromjpeg($filename);
+        } elseif (self::$imageType == IMAGETYPE_GIF) {
+            self::$image = imagecreatefromgif($filename);
+        } elseif (self::$imageType == IMAGETYPE_PNG) {
+            self::$image = imagecreatefrompng($filename);
         }
     }
 
-    function save($filename, $compression = 75, $permissions = null) {
-        if ($this->image_type == IMAGETYPE_JPEG) {
-            imagejpeg($this->image, $filename, $compression);
-        } elseif ($this->image_type == IMAGETYPE_GIF) {
-            imagegif($this->image, $filename, $compression);
-        } elseif ($this->image_type == IMAGETYPE_PNG) {
+    private static function save($filename, $compression = 75, $permissions = null): void
+    {
+        if (self::$imageType == IMAGETYPE_JPEG) {
+            imagejpeg(self::$image, $filename, $compression);
+        } elseif (self::$imageType == IMAGETYPE_GIF) {
+            imagegif(self::$image, $filename, $compression);
+        } elseif (self::$imageType == IMAGETYPE_PNG) {
             if ($compression == 75) {
                 $compression = 6; // low quality
             } elseif ($compression > 75) {
@@ -52,89 +55,101 @@ class SimpleImage {
             } else {
                 $compression = 0; // 100% quality
             }
-            imagepng($this->image, $filename, $compression);
+            imagepng(self::$image, $filename, $compression);
         }
         if ($permissions != null) {
             chmod($filename, $permissions);
         }
-        return TRUE;
     }
 
-    function output($image_type = IMAGETYPE_JPEG) {
+    private static function output($imageType = IMAGETYPE_JPEG): void
+    {
 
-        if ($image_type == IMAGETYPE_JPEG) {
-            imagejpeg($this->image);
-        } elseif ($image_type == IMAGETYPE_GIF) {
-
-            imagegif($this->image);
-        } elseif ($image_type == IMAGETYPE_PNG) {
-
-            imagepng($this->image);
+        switch ($imageType) {
+            case IMAGETYPE_JPEG:
+                imagejpeg(self::$image);
+                break;
+            case IMAGETYPE_GIF:
+                imagegif(self::$image);
+                break;
+            case IMAGETYPE_PNG:
+                imagepng(self::$image);
+                break;
         }
     }
 
-    function getWidth() {
-        return imagesx($this->image);
+    private static function getWidth(): int
+    {
+        return intval(imagesx(self::$image));
     }
 
-    function getHeight() {
-        return imagesy($this->image);
+    private static function getHeight(): int
+    {
+        return intval(imagesy(self::$image));
     }
 
-    function resizeToHeight($height) {
-        $ratio = $height / $this->getHeight();
-        $width = $this->getWidth() * $ratio;
-        $this->resize($width, $height);
+    private static function resizeToHeight($height): void
+    {
+        $ratio = $height / self::getHeight();
+        $width = intval(self::getWidth() * $ratio);
+        self::resize($width, $height);
     }
 
-    function resizeToWidth($width) {
-        $ratio = $width / $this->getWidth();
-        $height = $this->getheight() * $ratio;
-        $this->resize($width, $height);
+    private static function resizeToWidth($width): void
+    {
+        $ratio = $width / self::getWidth();
+        $height = (int)(self::getHeight() * $ratio);
+        self::resize($width, $height);
     }
 
-    function scale($scale) {
-        $width = $this->getWidth() * $scale / 100;
-        $height = $this->getheight() * $scale / 100;
-        $this->resize($width, $height);
+    private static function scale($scale): void
+    {
+        $width = (int)(self::getWidth() * $scale / 100);
+        $height = (int)(self::getHeight() * $scale / 100);
+        self::resize($width, $height);
     }
 
-    function resize($width, $height) {
-        if ($this->image_type == IMAGETYPE_GIF) {
+    private static function resize(int $width, int $height): void
+    {
+        if (self::$imageType == IMAGETYPE_GIF) {
             $new_image = imagecreate($width, $height); // for gif files
         } else {
             $new_image = imagecreatetruecolor($width, $height);
         }
-        if (($this->image_type == IMAGETYPE_GIF) || ($this->image_type == IMAGETYPE_PNG)) {
+        if ((self::$imageType == IMAGETYPE_GIF) || (self::$imageType == IMAGETYPE_PNG)) {
             imagealphablending($new_image, false);
             imagesavealpha($new_image, true);
             $transparent = imagecolorallocatealpha($new_image, 255, 255, 255, 127);
             imagefilledrectangle($new_image, 0, 0, $width, $height, $transparent);
         }
 
-        imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $width, $height, $this->getWidth(), $this->getHeight());
-        $this->image = $new_image;
+        imagecopyresampled($new_image, self::$image, 0, 0, 0, 0, $width, $height, self::getWidth(),
+            self::getHeight());
+        self::$image = $new_image;
     }
 
-    public static function saveNewResizedImage($imagePath, $newImagePath, $maxWidth, $maxHeight, $optimization = 75) {
-        $image = new SimpleImage();
-        $image->load($imagePath);
+    public static function saveNewResizedImage(
+        $imagePath,
+        $newImagePath,
+        $maxWidth,
+        $maxHeight,
+        $optimization = 75
+    ): void {
+        self::load($imagePath);
 
-        if ($maxWidth and $maxHeight == NULL) {
-            $image->resizeToWidth($maxWidth);
-        } elseif ($maxHeight and $maxWidth == NULL) {
-            $image->resizeToHeight($maxHeight);
+        if ($maxWidth and $maxHeight == null) {
+            self::resizeToWidth($maxWidth);
+        } elseif ($maxHeight and $maxWidth == null) {
+            self::resizeToHeight($maxHeight);
         } else {
-            if ($image->getWidth() >= $image->getHeight()) {
-                $image->resizeToWidth($maxWidth);
+            if (self::getWidth() >= self::getHeight()) {
+                self::resizeToWidth($maxWidth);
             } else {
-                $image->resizeToHeight($maxHeight);
+                self::resizeToHeight($maxHeight);
             }
         }
 
-        $image->save($newImagePath, $optimization);
+        self::save($newImagePath, $optimization);
     }
 
 }
-
-?>

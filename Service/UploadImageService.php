@@ -346,7 +346,7 @@ class UploadImageService
 
 
         if (($widthDefault and $width > $widthDefault) || ($heightDefault and $height > $heightDefault)) {
-            SimpleImage::saveNewResizedImage($originalPath, $originalPath, $widthDefault, $heightDefault, $quality);
+            (new SimpleImage)->saveNewResizedImage($originalPath, $originalPath, $widthDefault, $heightDefault, $quality);
         }
     }
 
