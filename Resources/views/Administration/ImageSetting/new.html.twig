@@ -45,11 +45,11 @@
     <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/selects/select2.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('admin/js/pages/form_select2.js') }}"></script>
     <script>
-        $("#md_bundle_medibundle_imagesetting_entityName").change(function () {
+        $("select[name*='[entityName]']").change(function () {
             var uploadPath = $(this).val().replace(/([A-Z])/g, function ($1) {
                 return "-" + $1.toLowerCase();
             }).substr(1);
-            $("#md_bundle_medibundle_imagesetting_uploadPath").val(uploadPath + "/");
+            $("input[name*='[uploadPath]']").val(uploadPath + "/");
         });
     </script>
 {% endblock javascripts %}
