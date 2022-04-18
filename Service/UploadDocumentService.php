@@ -159,13 +159,13 @@ class UploadDocumentService
             return new \Exception("Document type is not exist");
         }
         $uploadPath = $this->documentPaths->get($type);
-//        if (is_object($entity->getId()) and method_exists($entity->getId(), 'getId')) {
-//            $documentId = $entity->getId()->getId();
-//        } else {
-//            $documentId = $entity->getId();
-//        }
+        //        if (is_object($entity->getId()) and method_exists($entity->getId(), 'getId')) {
+        //            $documentId = $entity->getId()->getId();
+        //        } else {
+        //            $documentId = $entity->getId();
+        //        }
 
-        return date("Y/m/d")."/".$uploadPath.'document';
+        return date("Y/m/d")."/".ltrim($uploadPath, "/").'document';
     }
 
     /**
@@ -186,8 +186,8 @@ class UploadDocumentService
      * set error message
      *
      * @param string $message
-     * @param Request $request
-     * @return boolean
+     * @param Request|null $request
+     * @return boolean|string
      */
     private function setFlashMessage(string $message, Request $request = null): bool|string
     {

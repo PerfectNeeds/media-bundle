@@ -217,7 +217,7 @@ class UploadImageService
         //            $imageId = $entity->getId();
         //        }
 
-        return date("Y/m/d")."/".$uploadPath.'image';
+        return date("Y/m/d")."/".ltrim($uploadPath, "/").'image';
     }
 
     private function getClassName($object): ?string
@@ -346,7 +346,8 @@ class UploadImageService
 
 
         if (($widthDefault and $width > $widthDefault) || ($heightDefault and $height > $heightDefault)) {
-            (new SimpleImage)->saveNewResizedImage($originalPath, $originalPath, $widthDefault, $heightDefault, $quality);
+            (new SimpleImage)->saveNewResizedImage($originalPath, $originalPath, $widthDefault, $heightDefault,
+                $quality);
         }
     }
 
