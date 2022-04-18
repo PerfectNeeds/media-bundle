@@ -164,7 +164,7 @@ class UploadDocumentService
             $documentId = $entity->getId();
         }
 
-        return date("Y/m/d")."/".$uploadPath.'document';
+        return date("Y/m/d")."/".ltrim($uploadPath, "/").'document';
     }
 
     /**

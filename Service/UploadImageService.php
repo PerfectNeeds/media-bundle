@@ -214,7 +214,7 @@ class UploadImageService
             $imageId = $entity->getId();
         }
 
-        return date("Y/m/d")."/".$uploadPath.'image';
+        return date("Y/m/d")."/".ltrim($uploadPath, "/").'image';
     }
 
     private function getClassName($object)
