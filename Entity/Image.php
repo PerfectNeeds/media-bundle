@@ -8,7 +8,8 @@ use PN\ServiceBundle\Lib\UploadPath;
 /**
  * @ORM\MappedSuperclass
  */
-abstract class Image {
+abstract class Image
+{
 
     const TYPE_TEMP = 0;
     const TYPE_MAIN = 1;
@@ -62,42 +63,56 @@ abstract class Image {
      * @ORM\Column(type="smallint", nullable=true)
      */
     protected $imageType;
+
+    /**
+     * @ORM\Column(name="created", type="datetime")
+     */
+    protected $created;
+
     protected $file;
 
-    public function __construct() {
+    public function __construct()
+    {
 
     }
 
-    public function getImageTypes() {
+    public function getImageTypes()
+    {
         return $this->imageTypes;
     }
 
-    public function getUploadRootDirWithFileName() {
+    public function getUploadRootDirWithFileName()
+    {
         // the absolute directory extension where uploaded with image name
         // documents should be saved
         $directory = $this->getBasePath();
-        return UploadPath::getUploadRootDir($directory) . $this->getName();
+
+        return UploadPath::getUploadRootDir($directory).$this->getName();
     }
 
-    public function getAssetPath() {
-        return null === $this->name ? null : UploadPath::getUploadDir($this->getBasePath()) . $this->getName();
+    public function getAssetPath()
+    {
+        return null === $this->name ? null : UploadPath::getUploadDir($this->getBasePath()).$this->getName();
     }
 
-    public function getAssetPathThumb() {
-        return null === $this->name ? null : UploadPath::getUploadDir($this->getBasePath() . '/thumb/') . $this->getName();
+    public function getAssetPathThumb()
+    {
+        return null === $this->name ? null : UploadPath::getUploadDir($this->getBasePath().'/thumb/').$this->getName();
     }
 
-    public function preUpload($generatedImageName = NULL) {
+    public function preUpload($generatedImageName = null)
+    {
         if (null !== $this->file) {
-            if ($generatedImageName != NULL) {
-                $this->name = $generatedImageName . '-' . $this->getId() . '.' . $this->file->guessExtension();
+            if ($generatedImageName != null) {
+                $this->name = $generatedImageName.'-'.$this->getId().'.'.$this->file->guessExtension();
             } else {
-                $this->name = $this->getId() . '.' . $this->file->guessExtension();
+                $this->name = $this->getId().'.'.$this->file->guessExtension();
             }
         }
     }
 
-    public function upload($directory) {
+    public function upload($directory)
+    {
 
         if (null === $this->file) {
             return;
@@ -110,7 +125,8 @@ abstract class Image {
         unset($this->file);
     }
 
-    public function removeUpload() {
+    public function removeUpload()
+    {
         $this->storeFilenameForRemove();
         $this->storeFilenameForResizeRemove();
 
@@ -130,48 +146,58 @@ abstract class Image {
         }
     }
 
-    private function removeEmptySubFolders($path) {
+    private function removeEmptySubFolders($path)
+    {
         if (!file_exists($path)) {
             return false;
         }
         $empty = true;
-        foreach (glob($path . DIRECTORY_SEPARATOR . "*") as $file) {
+        foreach (glob($path.DIRECTORY_SEPARATOR."*") as $file) {
             $empty &= is_dir($file) && $this->RemoveEmptySubFolders($file);
         }
+
         return $empty && rmdir($path);
     }
 
-    public function getAbsoluteExtension($directory = null) {
+    public function getAbsoluteExtension($directory = null)
+    {
         if ($directory == null) {
             $directory = $this->getBasePath();
         }
-        return null === $this->name ? null : UploadPath::getUploadRootDir($directory) . $this->name;
+
+        return null === $this->name ? null : UploadPath::getUploadRootDir($directory).$this->name;
     }
 
-    private function storeFilenameForRemove($directory = null) {
+    private function storeFilenameForRemove($directory = null)
+    {
         $this->filenameForRemove = $this->getAbsoluteExtension($directory);
     }
 
-    public function storeFilenameForResizeRemove() {
+    public function storeFilenameForResizeRemove()
+    {
         $this->filenameForRemoveResize = $this->getAbsoluteResizeExtension();
     }
 
-    public function getAbsoluteResizeExtension($directory = null) {
+    public function getAbsoluteResizeExtension($directory = null)
+    {
         if ($directory == null) {
             $directory = $this->getBasePath();
         }
-        $thumpPath = UploadPath::getUploadRootDir($directory) . 'thumb/';
+        $thumpPath = UploadPath::getUploadRootDir($directory).'thumb/';
         if (!file_exists($thumpPath)) {
-            mkdir($thumpPath, 0777, TRUE);
+            mkdir($thumpPath, 0777, true);
         }
-        return null === $this->name ? null : $thumpPath . $this->name;
+
+        return null === $this->name ? null : $thumpPath.$this->name;
     }
 
-    public function getNameWithoutExtension() {
+    public function getNameWithoutExtension()
+    {
         return substr($this->name, 0, strrpos($this->name, '.'));
     }
 
-    public function getNameExtension() {
+    public function getNameExtension()
+    {
         return substr($this->name, strrpos($this->name, '.') + 1);
     }
 
@@ -181,23 +207,27 @@ abstract class Image {
      * @param string $name
      * @return Image
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function setFile($file) {
+    public function setFile($file)
+    {
         $this->file = $file;
 
         return $this;
     }
 
-    public function getFile() {
+    public function getFile()
+    {
         return $this->file;
     }
 
@@ -208,7 +238,8 @@ abstract class Image {
      *
      * @return Image
      */
-    public function setBasePath($basePath) {
+    public function setBasePath($basePath)
+    {
         $this->basePath = $basePath;
 
         return $this;
@@ -219,7 +250,8 @@ abstract class Image {
      *
      * @return string
      */
-    public function getBasePath() {
+    public function getBasePath()
+    {
         return $this->basePath;
     }
 
@@ -230,7 +262,8 @@ abstract class Image {
      *
      * @return Image
      */
-    public function setAlt($alt) {
+    public function setAlt($alt)
+    {
         $this->alt = $alt;
 
         return $this;
@@ -241,7 +274,8 @@ abstract class Image {
      *
      * @return string
      */
-    public function getAlt() {
+    public function getAlt()
+    {
         return $this->alt;
     }
 
@@ -252,7 +286,8 @@ abstract class Image {
      *
      * @return Image
      */
-    public function setWidth($width) {
+    public function setWidth($width)
+    {
         $this->width = $width;
 
         return $this;
@@ -263,7 +298,8 @@ abstract class Image {
      *
      * @return float
      */
-    public function getWidth() {
+    public function getWidth()
+    {
         return $this->width;
     }
 
@@ -274,7 +310,8 @@ abstract class Image {
      *
      * @return Image
      */
-    public function setHeight($height) {
+    public function setHeight($height)
+    {
         $this->height = $height;
 
         return $this;
@@ -285,7 +322,8 @@ abstract class Image {
      *
      * @return float
      */
-    public function getHeight() {
+    public function getHeight()
+    {
         return $this->height;
     }
 
@@ -296,7 +334,8 @@ abstract class Image {
      *
      * @return Image
      */
-    public function setSize($size) {
+    public function setSize($size)
+    {
         $this->size = $size;
 
         return $this;
@@ -307,7 +346,8 @@ abstract class Image {
      *
      * @return float
      */
-    public function getSize() {
+    public function getSize()
+    {
         return $this->size;
     }
 
@@ -318,7 +358,8 @@ abstract class Image {
      *
      * @return Image
      */
-    public function setTarteb($tarteb) {
+    public function setTarteb($tarteb)
+    {
         $this->tarteb = $tarteb;
 
         return $this;
@@ -329,7 +370,8 @@ abstract class Image {
      *
      * @return integer
      */
-    public function getTarteb() {
+    public function getTarteb()
+    {
         return $this->tarteb;
     }
 
@@ -340,7 +382,8 @@ abstract class Image {
      *
      * @return Image
      */
-    public function setImageType($imageType) {
+    public function setImageType($imageType)
+    {
         $this->imageType = $imageType;
 
         return $this;
@@ -351,7 +394,8 @@ abstract class Image {
      *
      * @return integer
      */
-    public function getImageType() {
+    public function getImageType()
+    {
         return $this->imageType;
     }
 
@@ -360,8 +404,20 @@ abstract class Image {
      *
      * @return integer
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
+    public function setCreated($created)
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    public function getCreated()
+    {
+        return $this->created;
+    }
 }
