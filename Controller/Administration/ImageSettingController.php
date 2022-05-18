@@ -38,7 +38,7 @@ class ImageSettingController extends AbstractController
         $imageTypes = $image->getImageTypes();
 
         foreach ($imageTypes as $imageTypeId => $imageTypeTitle) {
-            $imageType = $em->getRepository('PNMediaBundle:ImageType')->find($imageTypeId);
+            $imageType = $em->getRepository(ImageType::class)->find($imageTypeId);
             if (!$imageType) {
                 $imageType = new ImageType();
                 $imageType->setName($imageTypeTitle);
