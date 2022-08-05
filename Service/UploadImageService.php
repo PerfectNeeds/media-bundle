@@ -2,6 +2,7 @@
 
 namespace PN\MediaBundle\Service;
 
+use PN\ContentBundle\Service\PostService;
 use PN\MediaBundle\Entity\Image;
 use PN\MediaBundle\Entity\ImageSetting;
 use PN\MediaBundle\Utils\SimpleImage;
@@ -238,7 +239,7 @@ class UploadImageService
             // if the entity instance of Post Entity
             $className = $this->getClassName($entity);
             if ($className == "Post") {
-                $mainEntityId = $entity->getRelationalEntityId(); // Product, Category, etc
+                $mainEntityId = $this->container->get(PostService::class)->getRelationalEntityId($entity);// Product, Category, etc
                 $imageSetting = $this->getImageSetting($type);
                 $entityName = $imageSetting->getEntityName();
                 $generatedImageAlt = $this->getRawName($entityName, $mainEntityId, false);
@@ -262,7 +263,7 @@ class UploadImageService
             // if the entity instance of Post Entity
             $className = $this->getClassName($entity);
             if ($className == "Post") {
-                $mainEntityId = $entity->getRelationalEntityId(); // Product, Category, etc
+                $mainEntityId = $this->container->get(PostService::class)->getRelationalEntityId($entity);// Product, Category, etc
                 $imageSetting = $this->getImageSetting($type);
                 $entityName = $imageSetting->getEntityName();
                 $generatedImageName = $this->getRawName($entityName, $mainEntityId);
