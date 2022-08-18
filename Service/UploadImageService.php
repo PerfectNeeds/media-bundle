@@ -3,6 +3,7 @@
 namespace PN\MediaBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
+use PN\ContentBundle\Service\PostService;
 use PN\MediaBundle\Entity\Image;
 use PN\MediaBundle\Entity\ImageSetting;
 use PN\MediaBundle\Utils\SimpleImage;
@@ -25,8 +26,8 @@ class UploadImageService
     private $maxUploadSize = 1024000; // 1MB
     private $imagePaths;
     private $imageDimensions;
-    private $em;
-    private $container;
+    private EntityManagerInterface $em;
+    private PostService $postService;
     private $imageSetting;
     private $tmpImage = null;
 
@@ -34,9 +35,11 @@ class UploadImageService
         ContainerParameterService $containerParameterService,
         EntityManagerInterface $em,
         ImagePaths $imagePaths,
-        ImageDimension $imageDimension
+        ImageDimension $imageDimension,
+        PostService $postService
     ) {
         $this->em = $em;
+        $this->postService = $postService;
         $this->allowMimeType = $containerParameterService->get('pn_media_image.mime_types');
         $this->imageClass = $containerParameterService->get('pn_media_image.image_class');
         $this->imagePaths = $imagePaths;
@@ -241,7 +244,7 @@ class UploadImageService
             // if the entity instance of Post Entity
             $className = $this->getClassName($entity);
             if ($className == "Post") {
-                $mainEntityId = $entity->getRelationalEntityId(); // Product, Category, etc
+                $mainEntityId = $this->postService->getRelationalEntityId($entity); // Product, Category, etc
                 $imageSetting = $this->getImageSetting($type);
                 $entityName = $imageSetting->getEntityName();
                 $generatedImageAlt = $this->getRawName($entityName, $mainEntityId, false);
@@ -265,7 +268,7 @@ class UploadImageService
             // if the entity instance of Post Entity
             $className = $this->getClassName($entity);
             if ($className == "Post") {
-                $mainEntityId = $entity->getRelationalEntityId(); // Product, Category, etc
+                $mainEntityId = $this->postService->getRelationalEntityId($entity); // Product, Category, etc
                 $imageSetting = $this->getImageSetting($type);
                 $entityName = $imageSetting->getEntityName();
                 $generatedImageName = $this->getRawName($entityName, $mainEntityId);
