@@ -61,10 +61,14 @@ abstract class Document {
 
     public function preUpload($generatedImageName = NULL) {
         if (null !== $this->file) {
+            $extension = $this->file->guessExtension();
+            if (method_exists($this->file, 'getClientOriginalExtension')) {
+                $extension = $this->file->getClientOriginalExtension();
+            }
             if ($generatedImageName != NULL) {
-                $this->name = $generatedImageName . '-' . $this->getId() . '.' . $this->file->guessExtension();
+                $this->name = $generatedImageName . '-' . $this->getId() . '.' . $extension;
             } else {
-                $this->name = $this->getId() . '.' . $this->file->guessExtension();
+                $this->name = $this->getId() . '.' . $extension;
             }
         }
     }

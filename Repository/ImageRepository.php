@@ -7,8 +7,8 @@ use Doctrine\ORM\EntityRepository;
 
 class ImageRepository extends EntityRepository {
 
-    public function setMainImage($entityType, $entityId, $image, $newImageType = Image::TYPE_MAIN) {
-        if ($newImageType == Image::TYPE_MAIN) {
+    public function setMainImage($entityType, $entityId, $image, $newImageType = Image::TYPE_MAIN, $clearOldImage = false) {
+        if ($newImageType == Image::TYPE_MAIN or $clearOldImage == true) {
             $this->clearMain($entityType, $entityId, $newImageType);
         }
 
