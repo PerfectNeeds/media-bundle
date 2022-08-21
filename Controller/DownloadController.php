@@ -64,11 +64,10 @@ class DownloadController extends AbstractController
         $nameAndPath = $this->getDownloadNameAndPath($em);
         $path = $nameAndPath->path;
         $name = str_replace("/", "-", $nameAndPath->name);
-        //        try {
-        //            return $this->file($path, $name);
-        //        } catch (\Exception $e) {
-        //            throw  $this->createNotFoundException();
-        //        }
+        if (!file_exists($path)) {
+            throw $this->createNotFoundException();
+        }
+
         return $this->file($path, $name);
     }
 
