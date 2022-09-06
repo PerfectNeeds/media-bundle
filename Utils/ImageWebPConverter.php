@@ -145,7 +145,7 @@ class ImageWebPConverter
         imagesavealpha($image, true);
     }
 
-    private static function resize(string $path,  $image, int $width, int $height)
+    private static function resize(string $path, $image, int $width = null, int $height = null)
     {
         $imageInfo = getimagesize($path);
         $imageType = $imageInfo[2];
