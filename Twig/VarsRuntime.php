@@ -3,23 +3,20 @@
 namespace PN\MediaBundle\Twig;
 
 use PN\MediaBundle\Service\ImageDimension;
-use PN\MediaBundle\Utils\ImageWebPConverter;
-use PN\ServiceBundle\Lib\UploadPath;
+use PN\MediaBundle\Service\ImageWebPService;
 use PN\ServiceBundle\Utils\General;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 
 class VarsRuntime implements RuntimeExtensionInterface
 {
 
     private ImageDimension $imageDimension;
-    private ParameterBagInterface $parameterBag;
+    private ImageWebPService $imageWebPService;
 
-    public function __construct(ImageDimension $imageDimension, ParameterBagInterface $parameterBag)
+    public function __construct(ImageDimension $imageDimension, ImageWebPService $imageWebPService)
     {
-        $this->parameterBag = $parameterBag;
         $this->imageDimension = $imageDimension;
+        $this->imageWebPService = $imageWebPService;
     }
 
     public function fileSizeConvert($bytes): string
@@ -38,31 +35,9 @@ class VarsRuntime implements RuntimeExtensionInterface
     /**
      * @throws \Exception
      */
-    public function setWebpExtension(string $filePath, bool $returnEmptyOnException = true): string
+    public function setWebpExtension(string $filePath, int $width = null, int $height = null): string
     {
-        $projectDir = $this->parameterBag->get("kernel.project_dir");
-        $publicDirectory = rtrim(UploadPath::getWebRoot(), '/');
-
-        $originalFilePath = $filePath;
-        if (strpos($filePath, $publicDirectory) !== false) {
-            $filePath = substr($filePath, strpos($filePath, $publicDirectory) + strlen($publicDirectory));
-        }
-
-        $fullFilePath = "{$projectDir}/{$publicDirectory}{$filePath}";
-
-        if ($returnEmptyOnException && !file_exists($fullFilePath)) {
-            return '';
-        }
-
-        $webPPath = (new ImageWebPConverter())->convertImageToWebPAndCache($fullFilePath);
-
-        $assetPath = explode("{$projectDir}/{$publicDirectory}", $webPPath, 2)[1];
-        if (strpos($originalFilePath, $publicDirectory) !== false) {
-            $baseAssetPath = substr($originalFilePath, 0, strpos($originalFilePath, $publicDirectory)+ strlen($publicDirectory));
-            $assetPath  = $baseAssetPath.$assetPath;
-        }
-        
-        return $assetPath;
+        return $this->imageWebPService->convertToWebP($filePath, $width, $height);
     }
 
 }
