@@ -53,6 +53,11 @@ class ImageWebPService
             $assetPath = $baseAssetPath.$assetPath;
         }
 
+        if ($this->containerParameter->has("router.request_context.scheme") and $this->containerParameter->has("router.request_context.host")) {
+            $baseUrl = $this->containerParameter->get("router.request_context.scheme")."://".$this->containerParameter->get("router.request_context.host");
+            $assetPath = $baseUrl.$assetPath;
+        }
+
         return $assetPath;
     }
 
