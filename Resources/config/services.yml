@@ -16,14 +16,14 @@ services:
     public: false
     resource: '../../Twig/*'
 
-  PN\MediaBundle\Controller\Administration\:
-    public: false
-    resource: '../../Controller/Administration/*'
-    tags: [ 'controller.service_arguments' ]
-
   PN\MediaBundle\Controller\:
     public: false
     resource: '../../Controller/*'
+    tags: [ 'controller.service_arguments' ]
+
+  PN\MediaBundle\Controller\Administration\:
+    public: false
+    resource: '../../Controller/Administration/*'
     tags: [ 'controller.service_arguments' ]
 
   PN\MediaBundle\Repository\:

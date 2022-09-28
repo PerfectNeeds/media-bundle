@@ -1,8 +1,8 @@
 seo_admin:
-    resource: "@PNMediaBundle/Controller/Administration"
-    type:     annotation
-    prefix:   /admin/media
-    
+  resource: "@PNMediaBundle/Controller/Administration"
+  type: annotation
+  prefix: /admin/media
+
 download:
-    path:   /download
-    defaults:  { _controller: PNMediaBundle:Download:Download }
+  path: /download
+  defaults: { _controller: PN\MediaBundle\Controller\DownloadController::download }
