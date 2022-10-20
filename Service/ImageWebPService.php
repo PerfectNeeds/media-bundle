@@ -28,6 +28,10 @@ class ImageWebPService
         $absolutePublicDirectory = "{$projectDir}/{$publicDirectory}";
         $originalFilePath = $filePath;
 
+        if (strpos($filePath, ".webp") !== false) {
+            return $filePath;
+        }
+
         if (strpos($filePath, $publicDirectory) !== false) {
             $filePath = substr($filePath, strpos($filePath, $publicDirectory) + strlen($publicDirectory));
         }
