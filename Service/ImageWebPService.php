@@ -32,8 +32,8 @@ class ImageWebPService
             return $filePath;
         }
 
-        if (strpos($filePath, $publicDirectory) !== false) {
-            $filePath = substr($filePath, strpos($filePath, $publicDirectory) + strlen($publicDirectory));
+        if (strpos($filePath, $publicDirectory."/") !== false) {
+            $filePath = substr($filePath, strpos($filePath, $publicDirectory."/") + strlen($publicDirectory."/"));
         }
         if ($this->containerParameter->has("default_uri")) {
             $filePath = str_replace($this->containerParameter->get("default_uri"), "", $filePath);
