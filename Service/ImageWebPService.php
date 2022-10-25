@@ -32,8 +32,8 @@ class ImageWebPService
             return $filePath;
         }
 
-        if (strpos($filePath, $publicDirectory) !== false) {
-            $filePath = substr($filePath, strpos($filePath, $publicDirectory) + strlen($publicDirectory));
+        if (strpos($filePath, $publicDirectory."/") !== false) {
+            $filePath = substr($filePath, strpos($filePath, $publicDirectory."/") + strlen($publicDirectory."/"));
         }
         if ($this->containerParameter->has("router.request_context.scheme") and $this->containerParameter->has("router.request_context.host")) {
             $baseUrl = $this->containerParameter->get("router.request_context.scheme")."://".$this->containerParameter->get("router.request_context.host");
