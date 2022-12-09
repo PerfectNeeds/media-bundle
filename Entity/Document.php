@@ -82,7 +82,12 @@ abstract class Document {
         // you must throw an exception here if the file cannot be moved
         // so that the entity is not persisted to the database
         // which the UploadedFile move() method does
-        $this->file->move(UploadPath::getUploadRootDir($directory), $this->getName());
+        $uploadDirectory = UploadPath::getUploadRootDir($directory);
+        if(!file_exists($uploadDirectory)){
+            mkdir($uploadDirectory, 0777, true);
+        }
+
+        $this->file->move($uploadDirectory, $this->getName());
         unset($this->file);
     }
 
