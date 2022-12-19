@@ -40,7 +40,7 @@ class ImageWebPService
             $filePath = str_replace($baseUrl, "", $filePath);
         }
 
-
+        $filePath = "/".ltrim($filePath, '/');
         $fullFilePath = "{$projectDir}/{$publicDirectory}{$filePath}";
 
         if (!file_exists($fullFilePath)) {
