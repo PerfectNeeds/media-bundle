@@ -38,7 +38,7 @@ class ImageWebPService
         if ($this->containerParameter->has("default_uri")) {
             $filePath = str_replace($this->containerParameter->get("default_uri"), "", $filePath);
         }
-
+        $filePath = "/".ltrim($filePath, '/');
         $fullFilePath = "{$projectDir}/{$publicDirectory}{$filePath}";
 
         if (!file_exists($fullFilePath)) {
