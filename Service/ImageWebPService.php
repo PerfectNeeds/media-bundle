@@ -54,7 +54,7 @@ class ImageWebPService
         if (strpos($originalFilePath, $publicDirectory."/") !== false) {
             $baseAssetPath = substr($originalFilePath, 0,
                 strpos($originalFilePath, $publicDirectory."/") + strlen($publicDirectory."/"));
-            $assetPath = $baseAssetPath.$assetPath;
+            $assetPath = str_replace("//", "/", $baseAssetPath.$assetPath);
         }
 
         if ($this->containerParameter->has("router.request_context.scheme") and $this->containerParameter->has("router.request_context.host")) {
