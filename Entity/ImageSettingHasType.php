@@ -2,61 +2,76 @@
 
 namespace PN\MediaBundle\Entity;
 
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Doctrine\DBAL\Types\Types;
+use PN\MediaBundle\Repository\ImageSettingHasTypeRepository;
 use Doctrine\ORM\Mapping as ORM;
+
 
 /**
  * @ORM\Table("image_setting_has_type")
  * @ORM\Entity(repositoryClass="PN\MediaBundle\Repository\ImageSettingHasTypeRepository")
  */
-class ImageSettingHasType {
+#[ORM\Table(name: "image_setting_has_type")]
+#[ORM\Entity(repositoryClass: ImageSettingHasTypeRepository::class)]
+class ImageSettingHasType
+{
 
     /**
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="ImageType", inversedBy="imageSettingTypes", cascade={"persist"})
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: ImageType::class, cascade: ["persist"], inversedBy: "imageSettingTypes")]
     protected $imageType;
 
     /**
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="ImageSetting", inversedBy="imageSettingTypes", cascade={"persist"})
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: ImageSetting::class, cascade: ["persist"], inversedBy: "imageSettingTypes")]
     protected $imageSetting;
 
     /**
      * @ORM\Column(name="radio_button", type="boolean")
      */
+    #[ORM\Column(name: "radio_button", type: Types::BOOLEAN)]
     protected $radioButton = true;
 
     /**
      * @ORM\Column(name="width", type="float", length=255, nullable=true)
      */
+    #[ORM\Column(name: "width", type: Types::FLOAT, nullable: true)]
     protected $width;
 
     /**
      * @ORM\Column(name="height", type="float", length=255, nullable=true)
      */
+    #[ORM\Column(name: "height", type: Types::FLOAT, nullable: true)]
     protected $height;
 
     /**
      * @ORM\Column(name="thumb_width", type="float", nullable=true)
      */
+    #[ORM\Column(name: "height", type: Types::FLOAT, nullable: true)]
     protected $thumbWidth = null;
 
     /**
      * @ORM\Column(name="thumb_height", type="float", nullable=true)
      */
+    #[ORM\Column(name: "thumb_height", type: Types::FLOAT, nullable: true)]
     protected $thumbHeight = null;
 
     /**
      * @ORM\Column(name="validate_width_and_height", type="boolean")
      */
+    #[ORM\Column(name: "validate_width_and_height", type: Types::BOOLEAN)]
     protected $validateWidthAndHeight = true;
 
     /**
      * @ORM\Column(name="validate_size", type="boolean")
      */
+    #[ORM\Column(name: "validate_size", type: Types::BOOLEAN)]
     protected $validateSize = true;
 
     /**

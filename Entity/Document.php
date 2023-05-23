@@ -2,12 +2,14 @@
 
 namespace PN\MediaBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use PN\ServiceBundle\Lib\UploadPath;
 
 /**
  * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 abstract class Document {
 
     private $filenameForRemove;
@@ -15,16 +17,19 @@ abstract class Document {
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(name: "name", type: Types::STRING, length: 255, nullable: true)]
     protected $name;
 
     /**
      * @ORM\Column(name="base_path", type="string", length=255, nullable=true)
      */
+    #[ORM\Column(name: "base_path", type: Types::STRING, length: 255, nullable: true)]
     protected $basePath;
 
     /**
      * @ORM\Column(name="size", type="float", length=255, nullable=true)
      */
+    #[ORM\Column(name: "size", type: Types::FLOAT, length: 255, nullable: true)]
     protected $size;
     protected $file;
 

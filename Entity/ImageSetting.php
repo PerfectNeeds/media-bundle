@@ -2,9 +2,11 @@
 
 namespace PN\MediaBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
+use PN\MediaBundle\Repository\ImageSettingRepository;
+use PN\ServiceBundle\Interfaces\DateTimeInterface;
 use PN\ServiceBundle\Model\DateTimeTrait;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -16,7 +18,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="PN\MediaBundle\Repository\ImageSettingRepository")
  * @UniqueEntity("entityName",message="This entity name is used before.")
  */
-class ImageSetting {
+#[ORM\Table(name: "image_setting")]
+#[ORM\HasLifecycleCallbacks]
+#[ORM\Entity(repositoryClass: ImageSettingRepository::class)]
+#[UniqueEntity(fields: "entityName", message: "This entity name is used before.")]
+class ImageSetting implements DateTimeInterface
+{
 
     use DateTimeTrait;
 
@@ -29,44 +36,57 @@ class ImageSetting {
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(name: "id", type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
     /**
      * @Assert\NotBlank()
      * @ORM\Column(name="entity_name", type="string", length=255, nullable=true, unique=true)
      */
+    #[Assert\NotBlank]
+    #[ORM\Column(name: "entity_name", type: Types::STRING, length: 255, unique: true, nullable: true)]
     protected $entityName;
 
     /**
      * @Assert\NotBlank()
      * @ORM\Column(name="back_route", type="string", length=255, nullable=true)
      */
+    #[Assert\NotBlank]
+    #[ORM\Column(name: "back_route", type: Types::STRING, length: 255, nullable: true)]
     protected $backRoute;
 
     /**
      * @Assert\NotBlank()
      * @ORM\Column(name="upload_path", type="string", length=255, nullable=true)
      */
+    #[Assert\NotBlank]
+    #[ORM\Column(name: "upload_path", type: Types::STRING, length: 255, nullable: true)]
     protected $uploadPath;
 
     /**
      * @ORM\Column(name="auto_resize", type="boolean")
      */
+    #[ORM\Column(name: "auto_resize", type: Types::BOOLEAN)]
     protected $autoResize = true;
 
     /**
      * @ORM\Column(name="quality", type="smallint")
      */
+    #[ORM\Column(name: "quality", type: Types::SMALLINT)]
     protected $quality;
 
     /**
      * @ORM\Column(name="gallery", type="boolean")
      */
+    #[ORM\Column(name: "gallery", type: Types::BOOLEAN)]
     protected $gallery;
 
     /**
      * @ORM\OneToMany(targetEntity="ImageSettingHasType", mappedBy="imageSetting")
      */
+    #[ORM\OneToMany(mappedBy: "imageSetting", targetEntity: ImageSettingHasType::class)]
     protected $imageSettingTypes;
 
 
@@ -76,7 +96,9 @@ class ImageSetting {
      * @ORM\PrePersist
      * @ORM\PreUpdate
      */
-    public function updatedTimestamps()
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updatedTimestamps(): void
     {
         $this->setModified(new \DateTime(date('Y-m-d H:i:s')));
 

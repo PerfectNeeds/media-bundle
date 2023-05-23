@@ -2,12 +2,14 @@
 
 namespace PN\MediaBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use PN\ServiceBundle\Lib\UploadPath;
 
 /**
  * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 abstract class Image
 {
 
@@ -26,47 +28,56 @@ abstract class Image
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(name: "name", type: Types::STRING, length: 255, nullable: true)]
     protected $name;
 
     /**
      * @ORM\Column(name="base_path", type="string", length=255, nullable=true)
      */
+    #[ORM\Column(name: "base_path", type: Types::STRING, length: 255, nullable: true)]
     protected $basePath;
 
     /**
      * @ORM\Column(name="alt", type="string", length=255, nullable=true)
      */
+    #[ORM\Column(name: "alt", type: Types::STRING, length: 255, nullable: true)]
     protected $alt;
 
     /**
      * @ORM\Column(name="width", type="float", length=255, nullable=true)
      */
+    #[ORM\Column(name: "width", type: Types::FLOAT, nullable: true)]
     protected $width;
 
     /**
      * @ORM\Column(name="height", type="float", length=255, nullable=true)
      */
+    #[ORM\Column(name: "height", type: Types::FLOAT, nullable: true)]
     protected $height;
 
     /**
      * @ORM\Column(name="size", type="float", length=255, nullable=true)
      */
+    #[ORM\Column(name: "size", type: Types::FLOAT, nullable: true)]
     protected $size;
 
     /**
      * @var string
      * @ORM\Column(name="tarteb", type="smallint", nullable=true)
      */
+    #[ORM\Column(name: "tarteb", type: Types::SMALLINT, nullable: true)]
     protected $tarteb;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
      */
+    #[ORM\Column(name: "image_type", type: Types::SMALLINT, nullable: true)]
     protected $imageType;
 
     /**
      * @ORM\Column(name="created", type="datetime")
      */
+    #[ORM\Column(name: "created", type: Types::DATETIME_MUTABLE)]
     protected $created;
 
     protected $file;
