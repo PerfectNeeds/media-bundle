@@ -53,7 +53,7 @@ class ImageSettingHasType
     /**
      * @ORM\Column(name="thumb_width", type="float", nullable=true)
      */
-    #[ORM\Column(name: "height", type: Types::FLOAT, nullable: true)]
+    #[ORM\Column(name: "thumb_width", type: Types::FLOAT, nullable: true)]
     protected $thumbWidth = null;
 
     /**
