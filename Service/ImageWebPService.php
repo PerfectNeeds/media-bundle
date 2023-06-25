@@ -48,7 +48,7 @@ class ImageWebPService
             $width, $height);
 
         $assetPath = explode("{$projectDir}/{$publicDirectory}", $webPPath, 2)[1];
-        if (strpos($originalFilePath, $publicDirectory."/") !== false) {
+        if (strpos($originalFilePath, $publicDirectory."/") !== false and strpos($originalFilePath, "http") === false) {
             $baseAssetPath = substr($originalFilePath, 0,
                 strpos($originalFilePath, $publicDirectory."/") + strlen($publicDirectory."/"));
             $assetPath = str_replace("//","/",$baseAssetPath.$assetPath);
