@@ -33,11 +33,12 @@ class UploadImageService
 
     public function __construct(
         ContainerParameterService $containerParameterService,
-        EntityManagerInterface $em,
-        ImagePaths $imagePaths,
-        ImageDimension $imageDimension,
-        PostService $postService
-    ) {
+        EntityManagerInterface    $em,
+        ImagePaths                $imagePaths,
+        ImageDimension            $imageDimension,
+        PostService               $postService
+    )
+    {
         $this->em = $em;
         $this->postService = $postService;
         $this->allowMimeType = $containerParameterService->get('pn_media_image.mime_types');
@@ -54,10 +55,11 @@ class UploadImageService
         $imageType = Image::TYPE_MAIN,
         $objectName = "Image",
         $removeOldImage = false
-    ): bool|string|Image {
+    ): bool|string|Image
+    {
         $info = pathinfo($url);
         $contents = file_get_contents($url);
-        $file = '/tmp/'.$info['basename'];
+        $file = '/tmp/' . $info['basename'];
         file_put_contents($file, $contents);
         $this->tmpImage = $file;
         $file = new File($file, $info['basename']);
@@ -73,7 +75,8 @@ class UploadImageService
         $imageType = Image::TYPE_MAIN,
         $objectName = "Image",
         $removeOldImage = false
-    ): bool|string|Image {
+    ): bool|string|Image
+    {
         $file = new File($path);
 
         return $this->uploadSingleImage($entity, $file, $type, $request, $imageType, $objectName, $removeOldImage);
@@ -87,7 +90,8 @@ class UploadImageService
         $imageType = Image::TYPE_MAIN,
         $objectName = "Image",
         $removeOldImage = false
-    ) {
+    )
+    {
         $validate = $this->validate($file, $type, $imageType, $request);
         if ($validate !== true) {
             return $validate;
@@ -220,7 +224,7 @@ class UploadImageService
         //            $imageId = $entity->getId();
         //        }
 
-        return date("Y/m/d")."/".ltrim($uploadPath, "/").'image';
+        return date("Y/m/d") . "/" . ltrim($uploadPath, "/") . 'image';
     }
 
     private function getClassName($object): ?string
@@ -392,7 +396,7 @@ class UploadImageService
         }
     }
 
-    public function validate($file, $type, $imageType, Request $request = null): bool|string
+    public function validate($file, $type, $imageType = Image::TYPE_MAIN, Request $request = null): bool|string
     {
         if ($file === null) {
             return false;
@@ -492,7 +496,7 @@ class UploadImageService
                 continue;
             }
             $path = explode('\Entity\\', $entity);
-            $className = str_replace('\\', '', str_replace('PN\Bundle', '', $path[0])).':'.$path[1];
+            $className = str_replace('\\', '', str_replace('PN\Bundle', '', $path[0])) . ':' . $path[1];
         }
         if ($className == null) {
             return null;
@@ -535,27 +539,27 @@ class UploadImageService
     {
         $objectName = ($objectName == null) ? "Image" : $objectName;
 
-        return "get".ucfirst($objectName);
+        return "get" . ucfirst($objectName);
     }
 
     private function getSetterFunctionName($objectName = null): string
     {
         $objectName = ($objectName == null) ? "Image" : $objectName;
 
-        return "set".ucfirst($objectName);
+        return "set" . ucfirst($objectName);
     }
 
     private function getAddFunctionName($objectName = null): string
     {
         $objectName = ($objectName == null) ? "Image" : $objectName;
 
-        return "add".ucfirst($objectName);
+        return "add" . ucfirst($objectName);
     }
 
     private function getRemoveFunctionName($objectName = null): string
     {
         $objectName = ($objectName == null) ? "Image" : $objectName;
 
-        return "remove".ucfirst($objectName);
+        return "remove" . ucfirst($objectName);
     }
 }
