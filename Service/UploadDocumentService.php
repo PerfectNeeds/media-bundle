@@ -61,7 +61,7 @@ class UploadDocumentService
         Request $request = null,
         $objectName = null,
         array $mimeTypes = null,
-        $removeOldImage = true
+        $removeOldDocument = true
     ): Document|bool|string {
         if ($mimeTypes != null) {
             $this->allowMimeType = $mimeTypes;
@@ -74,7 +74,7 @@ class UploadDocumentService
         $uploadPath = $this->getUploadPath($type, $entity);
 
         // Remove old document
-        $this->removeOldDocument($entity, $objectName, $removeOldImage);
+        $this->removeOldDocument($entity, $objectName, $removeOldDocument);
 
 
         $document = $this->uploadDocument($file, $uploadPath);
@@ -120,13 +120,13 @@ class UploadDocumentService
      *
      * @param Object $entity (Post Entity or any Entity has OneToOne relation like product, etc...
      * @param null $objectName
-     * @param bool $removeOldImage
+     * @param bool $removeOldDocument
      * @return bool
      * @throws \Exception
      */
-    private function removeOldDocument($entity, $objectName = null, $removeOldImage = true): bool
+    private function removeOldDocument($entity, $objectName = null, $removeOldDocument = true): bool
     {
-        if (!$removeOldImage) {
+        if (!$removeOldDocument) {
             return false;
         }
         $getFunctionName = $this->getGetterFunctionName($objectName);

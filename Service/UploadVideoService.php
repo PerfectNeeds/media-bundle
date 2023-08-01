@@ -61,7 +61,7 @@ class UploadVideoService
         Request $request = null,
         $objectName = null,
         array $mimeTypes = null,
-        $removeOldImage = true
+        $removeOldVideo = true
     ): Video|bool|string {
         if ($mimeTypes != null) {
             $this->allowMimeType = $mimeTypes;
@@ -74,7 +74,7 @@ class UploadVideoService
         $uploadPath = $this->getUploadPath($type, $entity);
 
         // Remove old video
-        $this->removeOldVideo($entity, $objectName, $removeOldImage);
+        $this->removeOldVideo($entity, $objectName, $removeOldVideo);
 
 
         $video = $this->uploadVideo($file, $uploadPath);
@@ -120,13 +120,13 @@ class UploadVideoService
      *
      * @param Object $entity (Post Entity or any Entity has OneToOne relation like product, etc...
      * @param null $objectName
-     * @param bool $removeOldImage
+     * @param bool $removeOldVideo
      * @return bool
      * @throws \Exception
      */
-    private function removeOldVideo($entity, $objectName = null, $removeOldImage = true): bool
+    private function removeOldVideo($entity, $objectName = null, $removeOldVideo = true): bool
     {
-        if (!$removeOldImage) {
+        if (!$removeOldVideo) {
             return false;
         }
         $getFunctionName = $this->getGetterFunctionName($objectName);
