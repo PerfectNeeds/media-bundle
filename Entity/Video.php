@@ -48,6 +48,17 @@ abstract class Video
     #[ORM\Column(name: "created", type: Types::DATETIME_MUTABLE)]
     protected ?\DateTimeInterface $created = null;
 
+    public function setFile($file): static
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    public function getFile()
+    {
+        return $this->file;
+    }
 
     public function getUploadRootDirWithFileName(): string
     {
