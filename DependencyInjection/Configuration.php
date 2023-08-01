@@ -24,13 +24,14 @@ class Configuration implements ConfigurationInterface
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for
         // more information on that topic.
-        $this->addImageSestion($rootNode);
-        $this->addDocumentSestion($rootNode);
+        $this->addImageSection($rootNode);
+        $this->addDocumentSection($rootNode);
+        $this->addVideoSection($rootNode);
 
         return $treeBuilder;
     }
 
-    private function addImageSestion(ArrayNodeDefinition $rootNode)
+    private function addImageSection(ArrayNodeDefinition $rootNode)
     {
         $defaultMimeTypes = ['image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
         $rootNode->children()
@@ -59,7 +60,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function addDocumentSestion($rootNode)
+    private function addDocumentSection($rootNode)
     {
         $defaultMimeTypes = [
             'application/msword',
@@ -80,6 +81,33 @@ class Configuration implements ConfigurationInterface
             ->isRequired()
             ->children()
             ->scalarNode('document_class')
+            ->isRequired()
+            ->cannotBeEmpty()
+            ->end()
+            ->arrayNode('mime_types')->scalarPrototype()->end()->defaultValue($defaultMimeTypes)->end()
+            ->arrayNode('upload_paths')
+            ->arrayPrototype()
+            ->children()
+            ->scalarNode('id')->end()
+            ->scalarNode('path')->end()
+            ->end()
+            ->end()
+            ->end()
+            ->end()
+            ->end();
+    }
+
+    private function addVideoSection($rootNode)
+    {
+        $defaultMimeTypes = [
+            'video/mp4',
+            'video/quicktime',
+        ];
+        $rootNode->children()
+            ->arrayNode('video')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('video_class')
             ->isRequired()
             ->cannotBeEmpty()
             ->end()

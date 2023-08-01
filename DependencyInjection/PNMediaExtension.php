@@ -2,21 +2,23 @@
 
 namespace PN\MediaBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * This is the class that loads and manages your bundle configuration.
  *
  * @link http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
-class PNMediaExtension extends Extension {
+class PNMediaExtension extends Extension
+{
 
     private $alias = "pn_media";
 
-    public function load(array $configs, ContainerBuilder $container) {
+    public function load(array $configs, ContainerBuilder $container)
+    {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
         $this->convertConfigToParameter($container, $config);
@@ -25,9 +27,15 @@ class PNMediaExtension extends Extension {
         $loader->load('services.yml');
     }
 
-    private function convertConfigToParameter(ContainerBuilder $container, $config) {
+    private function convertConfigToParameter(ContainerBuilder $container, $config)
+    {
         $container->setParameter($this->alias . '_image', $config['image']);
-        $container->setParameter($this->alias . '_document', $config['document']);
+        if (array_key_exists("document", $config)) {
+            $container->setParameter($this->alias . '_document', $config['document']);
+        }
+        if (array_key_exists("video", $config)) {
+            $container->setParameter($this->alias . '_video', $config['video']);
+        }
     }
 
 }
