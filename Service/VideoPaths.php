@@ -18,11 +18,6 @@ class VideoPaths
     {
         $uploadPaths = $containerParameterService->get('pn_media_video.upload_paths');
 
-        if ($containerParameterService->has('pn_content_image.upload_paths')) {
-            $contentBundleUploadPaths = $containerParameterService->get('pn_content_video.upload_paths');
-            $uploadPaths = array_merge($uploadPaths, $contentBundleUploadPaths);
-        }
-
         foreach ($uploadPaths as $uploadPath) {
             $id = $uploadPath['id'];
             $path = rtrim($uploadPath['path'], '/').'/';
