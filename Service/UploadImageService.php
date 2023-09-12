@@ -23,7 +23,7 @@ class UploadImageService
 
     private $allowMimeType = [];
     private $imageClass;
-    private int $maxUploadSize = 2100000; // 2.1MB
+    private int $maxUploadSize = 2300000; // 2.3MB
     private ImagePaths $imagePaths;
     private ImageDimension $imageDimensions;
     private EntityManagerInterface $em;
