@@ -23,7 +23,7 @@ class UploadImageService
 
     private $allowMimeType = [];
     private $imageClass;
-    private int $maxUploadSize = 2048000; // 2MB
+    private int $maxUploadSize = 2100000; // 2.1MB
     private ImagePaths $imagePaths;
     private ImageDimension $imageDimensions;
     private EntityManagerInterface $em;
@@ -434,7 +434,7 @@ class UploadImageService
 
                 $fileSize = $file->getSize();
                 if ($fileSize > $this->maxUploadSize) {
-                    $message = sprintf("The image uploaded must be max %s", "1MB");
+                    $message = sprintf("The image uploaded must be max %s", "2MB");
 
                     return $this->setFlashMessage($message, $request);
                 }
