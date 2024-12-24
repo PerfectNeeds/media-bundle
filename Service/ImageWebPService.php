@@ -28,17 +28,17 @@ class ImageWebPService
         $absolutePublicDirectory = "{$projectDir}/{$publicDirectory}";
         $originalFilePath = $filePath;
 
-        if (strpos($filePath, ".webp") !== false) {
+        if (strpos($filePath, ".webp") !== false or strpos($filePath, 'http') === 0) {
             return $filePath;
         }
 
-        if (strpos($filePath, $publicDirectory."/") !== false) {
-            $filePath = substr($filePath, strpos($filePath, $publicDirectory."/") + strlen($publicDirectory."/"));
+        if (strpos($filePath, $publicDirectory . "/") !== false) {
+            $filePath = substr($filePath, strpos($filePath, $publicDirectory . "/") + strlen($publicDirectory . "/"));
         }
         if ($this->containerParameter->has("default_uri")) {
             $filePath = str_replace($this->containerParameter->get("default_uri"), "", $filePath);
         }
-        $filePath = "/".ltrim($filePath, '/');
+        $filePath = "/" . ltrim($filePath, '/');
         $fullFilePath = "{$projectDir}/{$publicDirectory}{$filePath}";
 
         if (!file_exists($fullFilePath)) {
@@ -48,16 +48,16 @@ class ImageWebPService
             $width, $height);
 
         $assetPath = explode("{$projectDir}/{$publicDirectory}", $webPPath, 2)[1];
-        if (strpos($originalFilePath, $publicDirectory."/") !== false and strpos($originalFilePath, "http") === false) {
+        if (strpos($originalFilePath, $publicDirectory . "/") !== false and strpos($originalFilePath, "http") === false) {
             $baseAssetPath = substr($originalFilePath, 0,
-                strpos($originalFilePath, $publicDirectory."/") + strlen($publicDirectory."/"));
-            $assetPath = str_replace("//","/",$baseAssetPath.$assetPath);
+                strpos($originalFilePath, $publicDirectory . "/") + strlen($publicDirectory . "/"));
+            $assetPath = str_replace("//", "/", $baseAssetPath . $assetPath);
         }
 
         if ($this->containerParameter->has("default_uri")) {
             $baseUrl = $this->containerParameter->get("default_uri");
             if (strpos($originalFilePath, $baseUrl) !== false) {
-                $assetPath = $this->containerParameter->get("default_uri").$assetPath;
+                $assetPath = $this->containerParameter->get("default_uri") . $assetPath;
             }
         }
 
