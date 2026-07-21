@@ -38,6 +38,8 @@ class SimpleImage
             self::$image = imagecreatefromgif($filename);
         } elseif (self::$imageType == IMAGETYPE_PNG) {
             self::$image = imagecreatefrompng($filename);
+        } elseif (self::$imageType == IMAGETYPE_WEBP) {
+            self::$image = imagecreatefromwebp($filename);
         }
     }
 
@@ -56,6 +58,8 @@ class SimpleImage
                 $compression = 0; // 100% quality
             }
             imagepng(self::$image, $filename, $compression);
+        } elseif (self::$imageType == IMAGETYPE_WEBP) {
+            imagewebp(self::$image, $filename, $compression);
         }
         if ($permissions != null) {
             chmod($filename, $permissions);
@@ -74,6 +78,9 @@ class SimpleImage
                 break;
             case IMAGETYPE_PNG:
                 imagepng(self::$image);
+                break;
+            case IMAGETYPE_WEBP:
+                imagewebp(self::$image);
                 break;
         }
     }
@@ -116,7 +123,7 @@ class SimpleImage
         } else {
             $new_image = imagecreatetruecolor($width, $height);
         }
-        if ((self::$imageType == IMAGETYPE_GIF) || (self::$imageType == IMAGETYPE_PNG)) {
+        if ((self::$imageType == IMAGETYPE_GIF) || (self::$imageType == IMAGETYPE_PNG) || (self::$imageType == IMAGETYPE_WEBP)) {
             imagealphablending($new_image, false);
             imagesavealpha($new_image, true);
             $transparent = imagecolorallocatealpha($new_image, 255, 255, 255, 127);

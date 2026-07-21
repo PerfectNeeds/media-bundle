@@ -33,7 +33,7 @@ class Configuration implements ConfigurationInterface
 
     private function addImageSection(ArrayNodeDefinition $rootNode)
     {
-        $defaultMimeTypes = ['image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
+        $defaultMimeTypes = ['image/gif', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
         $rootNode->children()
             ->arrayNode('image')
             ->addDefaultsIfNotSet()
